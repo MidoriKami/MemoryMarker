@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net7.0-windows7.0": {
+      "DalamudPackager": {
+        "type": "Direct",
+        "requested": "[2.1.2, )",
+        "resolved": "2.1.2",
+        "contentHash": "6i24wb36qPpJfyyVePHctXE3KXjQu4w3J12kdOlH5PZJcqB+aPkPZGuOebbDVCvt8RwNRjTnhhAFn8lHlvMmTg=="
+      },
+      "kamilib": {
+        "type": "Project"
+      }
+    }
+  }
+}

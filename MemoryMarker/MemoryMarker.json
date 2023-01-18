@@ -1,0 +1,16 @@
+{
+  "Author": "MidoriKami",
+  "Name": "Memory Marker",
+  "Punchline": "Simple Waymark Management with Renaming Features",
+  "Description": "Loads and Saves waymarkers when changing zones. Allows you to rename presets in the waymark window.",
+  "InternalName": "MemoryMarker",
+  "ApplicableVersion": "any",
+  "Tags": [
+    "Utility",
+    "UI",
+  ],
+    "CategoryTags": [
+    "Utility",
+    "UI"
+  ],
+}
