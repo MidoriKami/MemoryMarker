@@ -24,7 +24,7 @@ public class WaymarkManager : IDisposable
         
         if (CompabilityHelper.IsWaymarkPresetInstalled())
         {
-            Chat.PrintError("WaymarkPresetPlugin is not compatible with MemoryMarker. Please uninstall one of these plugins.");
+            Chat.PrintError(CompabilityHelper.WaymarkPresetWarning);
             return;
         }
     }
