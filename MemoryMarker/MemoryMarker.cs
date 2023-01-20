@@ -1,11 +1,12 @@
 ﻿using Dalamud.Plugin;
 using KamiLib;
+using MemoryMarker.System;
 
 namespace MemoryMarker;
 
 public sealed class Plugin : IDalamudPlugin
 {
-    public string Name => "Memory Marker";
+    public string Name => "MemoryMarker";
     
     public Plugin(DalamudPluginInterface pluginInterface)
     {
@@ -15,10 +16,14 @@ public sealed class Plugin : IDalamudPlugin
         
         Service.Configuration = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
         Service.Configuration.Initialize(pluginInterface);
+
+        Service.WaymarkManager = new WaymarkManager();
     }
 
     public void Dispose()
     {
         KamiCommon.Dispose();
+        
+        Service.WaymarkManager.Dispose();
     }
 }
