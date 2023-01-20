@@ -1,5 +1,6 @@
 ﻿using Dalamud.Plugin;
 using KamiLib;
+using MemoryMarker.Addons;
 using MemoryMarker.System;
 
 namespace MemoryMarker;
@@ -18,6 +19,7 @@ public sealed class Plugin : IDalamudPlugin
         Service.Configuration.Initialize(pluginInterface);
 
         Service.WaymarkManager = new WaymarkManager();
+        Service.AddonFieldMarker = new AddonFieldMarker();
     }
 
     public void Dispose()
@@ -25,5 +27,6 @@ public sealed class Plugin : IDalamudPlugin
         KamiCommon.Dispose();
         
         Service.WaymarkManager.Dispose();
+        Service.AddonFieldMarker.Dispose();
     }
 }

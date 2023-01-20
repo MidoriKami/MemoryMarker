@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Runtime.InteropServices;
+using Dalamud.Logging;
 using Dalamud.Utility.Signatures;
 using MemoryMarker.DataModels;
 
@@ -40,14 +41,38 @@ public unsafe class MemoryHelper
     {
         return Enumerable.Range(0, MarkerCount).Select(i => *GetFieldMarker(i)).ToArray();
     }
-    
-    public ZoneMarkerData GetZoneMarkerData(uint targetArea)
+
+    public void SaveZoneMarkerData(uint targetArea)
+    {
+        // If we have saved markers
+        if (Service.Configuration.FieldMarkerData.TryGetValue(targetArea, out var value))
+        {
+            // Overwrite Existing Markers
+            var markers = GetZoneMarkerData(targetArea);
+            value.UpdateMarkerData(markers.MarkerData);
+            Service.Configuration.Save();
+            PluginLog.Debug($"Saving Waymarks. Count: {Service.Configuration.FieldMarkerData[targetArea].GetMarkerCount()}");
+        }
+        else
+        {
+            // Create and Save Markers
+            var markers = GetZoneMarkerData(targetArea);
+
+            if (markers.GetMarkerCount() > 0)
+            {
+                Service.Configuration.FieldMarkerData.Add(targetArea, markers);
+                Service.Configuration.Save();
+                PluginLog.Debug($"Saving Waymarks. Count: {Service.Configuration.FieldMarkerData[targetArea].GetMarkerCount()}");
+            }
+        } 
+    }
+
+    private ZoneMarkerData GetZoneMarkerData(uint targetArea)
     {
         var markers = GetFieldMarkers();
         var newZoneData = new ZoneMarkerData
         {
             MarkerData =  new NamedMarker[MarkerCount],
-            TerritoryType = targetArea,
         };
 
         // Check each of the current waymarks if they match the target TerritoryType
@@ -55,12 +80,12 @@ public unsafe class MemoryHelper
         {
             if (markers[index].GetTerritoryId() != targetArea) continue;
 
-            var marker = markers[index];
-            
             newZoneData.MarkerData[index] = new NamedMarker
             {
-                Marker = marker,
+                Marker = markers[index],
+                Name = string.Empty,
             };
+            
         }
 
         return newZoneData;

@@ -1,0 +1,165 @@
+﻿using System;
+using System.Linq;
+using Dalamud.ContextMenu;
+using Dalamud.Game.Text.SeStringHandling;
+using Dalamud.Game.Text.SeStringHandling.Payloads;
+using Dalamud.Hooking;
+using Dalamud.Utility.Signatures;
+using FFXIVClientStructs.FFXIV.Client.System.String;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+using FFXIVClientStructs.FFXIV.Component.GUI;
+using KamiLib.Atk;
+using KamiLib.ChatCommands;
+using KamiLib.Hooking;
+using MemoryMarker.Utilities;
+using MemoryMarker.Windows;
+
+namespace MemoryMarker.Addons;
+
+public unsafe class AddonFieldMarker : IDisposable
+{
+    private readonly DalamudContextMenu contextMenu;
+    private readonly GameObjectContextMenuItem contextMenuItem;
+    private static SeString ContextMenuLabel => new(new TextPayload("Rename"));
+
+    [Signature("40 53 48 83 EC 50 F6 81 ?? ?? ?? ?? ?? 48 8B D9 0F 29 74 24 ?? 0F 28 F1 74 7B", DetourName = nameof(Update))]
+    private readonly Hook<Delegates.Addon.Update>? onUpdateHook = null!;
+
+    private readonly Hook<Delegates.Agent.ReceiveEvent>? onReceiveEventHook;
+
+    private static AtkUnitBase* AddonBase => (AtkUnitBase*) Service.GameGui.GetAddonByName("FieldMarker");
+    private byte SelectedPage => *((byte*)AddonBase + 1408);
+    private int HoveredIndex => *(int*) ((byte*) AddonBase + 1404);
+    private int lastHoveredIndex;
+    
+    public AddonFieldMarker()
+    {
+        SignatureHelper.Initialise(this);
+        
+        contextMenu = new DalamudContextMenu();
+        contextMenuItem = new GameObjectContextMenuItem(ContextMenuLabel, RenameContextMenuAction, true);
+        contextMenu.OnOpenGameObjectContextMenu += OpenGameObjectContextMenu;
+
+        var agent = AgentModule.Instance()->GetAgentByInternalId(AgentId.FieldMarker);
+
+        onReceiveEventHook ??= Hook<Delegates.Agent.ReceiveEvent>.FromAddress(new nint(agent->VTable->ReceiveEvent), ReceiveEvent);
+        onReceiveEventHook.Enable();
+        
+        onUpdateHook.Enable();
+    }
+
+    public void Dispose()
+    {
+        contextMenu.OnOpenGameObjectContextMenu -= OpenGameObjectContextMenu;
+        contextMenu.Dispose();
+        
+        onReceiveEventHook?.Dispose();
+        onUpdateHook?.Dispose();
+    }
+
+    private nint ReceiveEvent(AgentInterface* agent, nint rawdata, AtkValue* args, uint argcount, ulong sender)
+    {
+        var result = onReceiveEventHook!.Original(agent, rawdata, args, argcount, sender);
+        
+        Safety.ExecuteSafe(() =>
+        {
+            if (args[0].Int is 2 or 0)
+            {
+                MemoryHelper.Instance.SaveZoneMarkerData(Service.ClientState.TerritoryType);
+            }
+        });
+
+        return result;
+    }
+    
+    private byte Update(AtkUnitBase* addon)
+    {
+        var result = onUpdateHook!.Original(addon);
+
+        Safety.ExecuteSafe(() =>
+        {
+            var baseNode = new BaseNode("FieldMarker");
+
+            if (HoveredIndex != -1)
+            {
+                lastHoveredIndex = HoveredIndex;
+            }
+
+            if (Service.Configuration.FieldMarkerData.ContainsKey(Service.ClientState.TerritoryType))
+            {
+                foreach (var index in Enumerable.Range(0, 5))
+                {
+                    var nodeIndex = (uint)(21 + index * 2);
+                    var settingIndex = index + 5 * SelectedPage;
+
+                    if (Service.Configuration.FieldMarkerData[Service.ClientState.TerritoryType].MarkerData[settingIndex] is { } markerData)
+                    {
+                        var textNode = baseNode.GetComponentNode(nodeIndex).GetNode<AtkTextNode>(5);
+                        if (markerData.Name != string.Empty)
+                        {
+                            textNode->SetText($"{settingIndex + 1}. {markerData.Name}");
+                        }
+                    }
+                    else
+                    {
+                        var textNode = baseNode.GetComponentNode(nodeIndex).GetNode<AtkTextNode>(5);
+                        textNode->SetText(string.Empty);
+                    }
+                }
+            }
+        });
+
+        return result;
+    }
+    
+    private void OpenGameObjectContextMenu(GameObjectContextMenuOpenArgs args)
+    {
+        if (args.ParentAddonName != "FieldMarker") return;
+        
+        args.AddCustomItem(contextMenuItem);
+    }
+
+    private void RenameContextMenuAction(GameObjectContextMenuItemSelectedArgs args)
+    {
+        // var index = GetSelectedIndex();
+        if (lastHoveredIndex == -1)
+        {
+            Chat.PrintError("Tried to rename invalid entry. Aborting.");
+            return;
+        }
+        
+        // Save current markers just in case they are stale
+        MemoryHelper.Instance.SaveZoneMarkerData(Service.ClientState.TerritoryType);
+        
+        var settingIndex = lastHoveredIndex + 5 * SelectedPage;
+        
+        if (Service.Configuration.FieldMarkerData[Service.ClientState.TerritoryType].MarkerData[settingIndex] is not null)
+        {
+            RenameWindow.ShowWindow(settingIndex);
+        }
+    }
+    
+    private string? GetTooltipText()
+    {
+        var fieldMarkerAgent = AgentModule.Instance()->GetAgentByInternalId(AgentId.FieldMarker);
+        var tooltipStringPointer = (Utf8String*)((byte*) fieldMarkerAgent + 3184);
+        if (tooltipStringPointer->IsEmpty != 0) return null;
+
+        return tooltipStringPointer->ToString();
+    }
+
+    public string GetTooltipFirstLine()
+    {
+        var fullTooltip = GetTooltipText();
+        if (fullTooltip is null) throw new Exception("Something went wrong, this shouldn't have been called without checking the string first.");
+
+        var splits = fullTooltip.Split("\n");
+        
+        var firstLine = splits.FirstOrDefault();
+        if (firstLine is null) throw new FormatException("Failed to parse tooltip text.");
+
+        var firstSpaceIndex = firstLine.IndexOf(" ", StringComparison.Ordinal) + 1;
+
+        return firstLine[firstSpaceIndex..];
+    }
+}

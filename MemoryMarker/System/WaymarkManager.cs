@@ -57,24 +57,7 @@ public class WaymarkManager : IDisposable
     {
         if (previousTerritoryType is not 0)
         {
-            // If we have saved markers
-            if (Service.Configuration.FieldMarkerData.ContainsKey(previousTerritoryType))
-            {
-                var markers = MemoryHelper.Instance.GetZoneMarkerData(previousTerritoryType);
-
-                Service.Configuration.FieldMarkerData[previousTerritoryType] = markers;
-                Service.Configuration.Save();
-            }
-            else
-            {
-                var markers = MemoryHelper.Instance.GetZoneMarkerData(previousTerritoryType);
-
-                if (markers.GetMarkerCount() > 0)
-                {
-                    Service.Configuration.FieldMarkerData.Add(previousTerritoryType, markers);
-                    Service.Configuration.Save();
-                }
-            }
+            MemoryHelper.Instance.SaveZoneMarkerData(previousTerritoryType);
         }
 
         previousTerritoryType = territoryType;

@@ -2,6 +2,6 @@
 
 public class NamedMarker
 {
-    public FieldMarkerStruct Marker { get; init; }
-    public string Name { get; set; } = string.Empty;
+    public FieldMarkerStruct Marker { get; set; }
+    public string Name = string.Empty;
 }
