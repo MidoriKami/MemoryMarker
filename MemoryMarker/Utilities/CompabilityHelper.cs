@@ -5,5 +5,5 @@ namespace MemoryMarker.Utilities;
 public static class CompabilityHelper
 {
     public static bool IsWaymarkPresetInstalled() => Service.PluginInterface.PluginInternalNames.Any(internalName => internalName == "WaymarkPresetPlugin");
-    public const string WaymarkPresetWarning = "WaymarkPresetPlugin is not compatible with MemoryMarker. Please uninstall one of these plugins.";
+    public const string WaymarkPresetWarning = "WaymarkPreset plugin detected, to prevent conflicts MemoryMarker has been disabled.";
 }
