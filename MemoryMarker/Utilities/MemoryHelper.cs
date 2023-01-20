@@ -75,7 +75,7 @@ public unsafe class MemoryHelper
             
             if (savedMarker is null)
             {
-                Marshal.Copy(new byte[104], 0, (nint)targetAddress, 104);
+                Marshal.Copy(new byte[sizeof(FieldMarkerStruct)], 0, (nint)targetAddress, sizeof(FieldMarkerStruct));
             }
             else
             {
@@ -90,7 +90,7 @@ public unsafe class MemoryHelper
         {
             var targetAddress = GetFieldMarker(index);
             
-            Marshal.Copy(new byte[104], 0, (nint)targetAddress, 104);
+            Marshal.Copy(new byte[sizeof(FieldMarkerStruct)], 0, (nint)targetAddress, sizeof(FieldMarkerStruct));
         }
     }
 }
