@@ -1,7 +1,6 @@
 ﻿using Dalamud.Plugin;
 using KamiLib;
 using MemoryMarker.System;
-using MemoryMarker.Windows;
 
 namespace MemoryMarker;
 
@@ -19,8 +18,6 @@ public sealed class Plugin : IDalamudPlugin
         Service.Configuration.Initialize(pluginInterface);
 
         Service.WaymarkManager = new WaymarkManager();
-        
-        KamiCommon.WindowManager.AddWindow(new DebugWindow());
     }
 
     public void Dispose()
