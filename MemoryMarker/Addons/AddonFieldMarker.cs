@@ -160,7 +160,7 @@ public unsafe class AddonFieldMarker : IDisposable
     public string GetTooltipFirstLine()
     {
         var fullTooltip = GetTooltipText();
-        if (fullTooltip is null) throw new Exception("Something went wrong, this shouldn't have been called without checking the string first.");
+        if (fullTooltip is null) throw new Exception("Something went wrong, this should only get called when renaming a valid preset.");
 
         var splits = fullTooltip.Split("\n");
         
