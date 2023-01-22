@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using Dalamud.Interface;
+using Dalamud.Interface.Internal.Notifications;
 using Dalamud.Interface.Windowing;
-using Dalamud.Logging;
 using ImGuiNET;
 using KamiLib;
 
@@ -34,7 +34,6 @@ public class RenameWindow : Window
         {
             _instance = new RenameWindow(slotIndex);
             KamiCommon.WindowManager.AddWindow(_instance);
-            PluginLog.Debug($"Opening Rename Window: Slot {slotIndex + 1}");
         }
     }
     
@@ -55,8 +54,9 @@ public class RenameWindow : Window
         ImGui.InputText("###RenameTextInput", ref setting.Name, 35, ImGuiInputTextFlags.AutoSelectAll);
 
         ImGuiHelpers.ScaledDummy(10.0f);
-        ImGui.SetCursorPos(ImGui.GetCursorPos() with {X = region.X - 93.0f});
-        if (ImGui.Button("Save & Close", ImGuiHelpers.ScaledVector2(100.0f, 23.0f)))
+        var buttonSize = ImGuiHelpers.ScaledVector2(100.0f, 23.0f);
+        ImGui.SetCursorPos(ImGui.GetCursorPos() with {X = region.X - (buttonSize.X * 0.93f)});
+        if (ImGui.Button("Save & Close", buttonSize))
         {
             Service.Configuration.Save();
             IsOpen = false;
@@ -65,10 +65,10 @@ public class RenameWindow : Window
 
     public override void OnClose()
     {
+        Service.PluginInterface.UiBuilder.AddNotification("Preset name saved.", "Memory Marker", NotificationType.Success);
+        
         KamiCommon.WindowManager.RemoveWindow(this);
         _instance = null;
         Service.Configuration.Save();
-
-        PluginLog.Debug($"Closing Rename Window: Slot {slotIndex + 1}");
     }
 }
