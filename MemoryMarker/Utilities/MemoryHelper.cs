@@ -85,7 +85,6 @@ public unsafe class MemoryHelper
                 Marker = markers[index],
                 Name = string.Empty,
             };
-            
         }
 
         return newZoneData;
