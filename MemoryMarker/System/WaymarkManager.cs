@@ -1,7 +1,6 @@
 ﻿using System;
 using Dalamud.Logging;
 using Dalamud.Utility.Signatures;
-using KamiLib.ChatCommands;
 using MemoryMarker.Utilities;
 
 namespace MemoryMarker.System;
@@ -22,18 +21,20 @@ public class WaymarkManager : IDisposable
         Service.ClientState.TerritoryChanged -= OnZoneChange;
     }
     
-    private void OnZoneChange(object? sender, ushort e)
+    private void OnZoneChange(object? sender, ushort territoryType)
     {
         if (Service.ClientState.IsPvP) return;
         
+        SaveMarkerData(territoryType);
+        
         if (CompabilityHelper.IsWaymarkPresetInstalled())
         {
-            Chat.PrintError(CompabilityHelper.WaymarkPresetWarning);
-            return;
+            PluginLog.Information(CompabilityHelper.WaymarkPresetWarning);
         }
-
-        SaveMarkerData(e);
-        LoadMarkerData(e);
+        else
+        {
+            LoadMarkerData(territoryType);
+        }
     }
     
     private void LoadMarkerData(ushort territoryType)
