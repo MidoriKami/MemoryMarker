@@ -9,7 +9,6 @@ using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using KamiLib.Atk;
-using KamiLib.ChatCommands;
 using KamiLib.Hooking;
 using MemoryMarker.Utilities;
 using MemoryMarker.Windows;
