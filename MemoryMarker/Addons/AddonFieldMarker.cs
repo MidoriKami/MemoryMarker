@@ -57,15 +57,25 @@ public unsafe class AddonFieldMarker : IDisposable
         onUpdateHook?.Dispose();
     }
 
-    private nint ReceiveEvent(AgentInterface* agent, nint rawdata, AtkValue* args, uint argcount, ulong sender)
+    private nint ReceiveEvent(AgentInterface* agent, nint rawData, AtkValue* args, uint argCount, ulong sender)
     {
-        var result = onReceiveEventHook!.Original(agent, rawdata, args, argcount, sender);
+        var result = onReceiveEventHook!.Original(agent, rawData, args, argCount, sender);
         
         Safety.ExecuteSafe(() =>
         {
-            if (args[0].Int is 2 or 0)
+            // Fallthrough switch to make logic more clear
+            switch (args[0].Int)
             {
-                MemoryHelper.Instance.SaveZoneMarkerData(Service.ClientState.TerritoryType);
+                // Preset Button is LeftClicked
+                case 2:
+                    
+                // Window is closed    
+                case -1 or -2:
+                    
+                // Preset is deleted or overwritten    
+                case 0 when argCount is 5:
+                    MemoryHelper.Instance.SaveZoneMarkerData(Service.ClientState.TerritoryType);
+                    break;
             }
         });
 
