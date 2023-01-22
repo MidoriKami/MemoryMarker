@@ -98,17 +98,23 @@ public unsafe class AddonFieldMarker : IDisposable
             {
                 foreach (var index in Enumerable.Range(0, 5))
                 {
+                    // target nodes are 21, 23, 25, 27, and 29
+                    // The "update slot" buttons are between these indexes, we don't care about that button
                     var nodeIndex = (uint)(21 + index * 2);
                     var settingIndex = index + 5 * SelectedPage;
 
                     if (Service.Configuration.FieldMarkerData[Service.ClientState.TerritoryType].MarkerData[settingIndex] is { } markerData)
                     {
+                        // If we have string data for this node, set it, if not, let the game write whatever it would normally write.
                         var textNode = baseNode.GetComponentNode(nodeIndex).GetNode<AtkTextNode>(5);
                         if (markerData.Name != string.Empty)
                         {
                             textNode->SetText($"{settingIndex + 1}. {markerData.Name}");
                         }
                     }
+                    
+                    // We have settings for this zone, but this index is null, so set the string to empty.
+                    // this causes the game to show the subtle + marker
                     else
                     {
                         var textNode = baseNode.GetComponentNode(nodeIndex).GetNode<AtkTextNode>(5);
@@ -130,21 +136,15 @@ public unsafe class AddonFieldMarker : IDisposable
 
     private void RenameContextMenuAction(GameObjectContextMenuItemSelectedArgs args)
     {
-        // var index = GetSelectedIndex();
-        if (lastHoveredIndex == -1)
+        // Check that we have saved config for this territory
+        if (Service.Configuration.FieldMarkerData.ContainsKey(Service.ClientState.TerritoryType))
         {
-            Chat.PrintError("Tried to rename invalid entry. Aborting.");
-            return;
-        }
-        
-        // Save current markers just in case they are stale
-        MemoryHelper.Instance.SaveZoneMarkerData(Service.ClientState.TerritoryType);
-        
-        var settingIndex = lastHoveredIndex + 5 * SelectedPage;
-        
-        if (Service.Configuration.FieldMarkerData[Service.ClientState.TerritoryType].MarkerData[settingIndex] is not null)
-        {
-            RenameWindow.ShowWindow(settingIndex);
+            // Check that the preset we are modifying exists
+            var settingIndex = lastHoveredIndex + 5 * SelectedPage;
+            if (Service.Configuration.FieldMarkerData[Service.ClientState.TerritoryType].MarkerData[settingIndex] is not null)
+            {
+                RenameWindow.ShowWindow(settingIndex);
+            }
         }
     }
     
