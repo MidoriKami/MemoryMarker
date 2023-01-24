@@ -14,7 +14,7 @@ public unsafe class MemoryHelper
     private delegate nint GetFieldMarkerDataSection(nint pConfigFile = 0, byte sectionIndex = 0x11);
     private delegate FieldMarkerStruct* GetFieldMarkerData(nint uiSaveSegmentAddress, int slot);
 
-    [Signature("40 53 48 83 EC 20 48 8B 0D ?? ?? ?? ?? 0F B7 DA")]
+    [Signature("40 53 48 83 EC 20 48 8B 0D ?? ?? ?? ?? 0F B7 DA E8 ?? ?? ?? ?? 4C 8B C0")]
     private readonly GetFieldMarkerDataSection? getUiSaveSegmentAddress = null;
 
     [Signature("4C 8B C9 85 D2 78 0A")] 
