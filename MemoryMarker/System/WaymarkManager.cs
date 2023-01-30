@@ -7,8 +7,6 @@ namespace MemoryMarker.System;
 
 public class WaymarkManager : IDisposable
 {
-    private uint previousTerritoryType;
-    
     public WaymarkManager()
     {
         SignatureHelper.Initialise(this);
@@ -25,7 +23,7 @@ public class WaymarkManager : IDisposable
     {
         if (Service.ClientState.IsPvP) return;
         
-        SaveMarkerData(territoryType);
+        MemoryHelper.Instance.SaveMarkerData();
         
         if (CompabilityHelper.IsWaymarkPresetInstalled())
         {
@@ -52,15 +50,5 @@ public class WaymarkManager : IDisposable
             MemoryHelper.Instance.ClearZoneMarkerData();
             PluginLog.Debug($"Marker data not found, clearing waymarks");
         }
-    }
-
-    private void SaveMarkerData(ushort territoryType)
-    {
-        if (previousTerritoryType is not 0)
-        {
-            MemoryHelper.Instance.SaveZoneMarkerData(previousTerritoryType);
-        }
-
-        previousTerritoryType = territoryType;
     }
 }
