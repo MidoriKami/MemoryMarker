@@ -12,6 +12,8 @@ public class RenameWindow : Window
     private static RenameWindow? _instance;
 
     private readonly int slotIndex;
+
+    private bool isFocusSet;
     
     private RenameWindow(int slotIndex) : base("Rename Waymark")
     {
@@ -50,6 +52,7 @@ public class RenameWindow : Window
         ImGuiHelpers.ScaledDummy(10.0f);
 
         var region = ImGui.GetContentRegionAvail();
+        SetFocus();
         ImGui.SetNextItemWidth(region.X);
         ImGui.InputText("###RenameTextInput", ref setting.Name, 35, ImGuiInputTextFlags.AutoSelectAll);
 
@@ -60,6 +63,14 @@ public class RenameWindow : Window
         {
             Service.Configuration.Save();
             IsOpen = false;
+        }
+    }
+    private void SetFocus()
+    {
+        if (!isFocusSet)
+        {
+            ImGui.SetKeyboardFocusHere();
+            isFocusSet = true;
         }
     }
 
