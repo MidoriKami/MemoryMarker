@@ -17,7 +17,7 @@ No longer will you wonder which preset is which set of markers!
 
 - If you have the WaymarkPreset plugin installed, MemoryMarker will not replace the waymark slots with the saved waymarks
 
-  - Unexpected behavior may result from having both MemoryMarker and WaymarPreset installed
+  - Unexpected behavior may result from having both MemoryMarker and WaymarkPreset installed
   
   - It is not recommended to use both WaymarkPreset and MemoryMarker at the same time
 
