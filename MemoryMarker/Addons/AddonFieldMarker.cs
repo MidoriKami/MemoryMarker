@@ -73,7 +73,7 @@ public unsafe class AddonFieldMarker : IDisposable
                     
                 // Preset is deleted or overwritten    
                 case 0 when argCount is 5:
-                    MemoryHelper.Instance.SaveZoneMarkerData(Service.ClientState.TerritoryType);
+                    MemoryHelper.Instance.SaveMarkerData();
                     break;
             }
         });

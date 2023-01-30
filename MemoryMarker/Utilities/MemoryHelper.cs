@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Dalamud.Logging;
 using Dalamud.Utility.Signatures;
@@ -42,7 +43,15 @@ public unsafe class MemoryHelper
         return Enumerable.Range(0, MarkerCount).Select(i => *GetFieldMarker(i)).ToArray();
     }
 
-    public void SaveZoneMarkerData(uint targetArea)
+    public void SaveMarkerData()
+    {
+        foreach (var territory in GetMarkerTerritories())
+        {
+            SaveMarkerDataForTerritory(territory);
+        }
+    }
+    
+    private void SaveMarkerDataForTerritory(uint targetArea)
     {
         // If we have saved markers
         if (Service.Configuration.FieldMarkerData.TryGetValue(targetArea, out var value))
@@ -67,6 +76,16 @@ public unsafe class MemoryHelper
         } 
     }
 
+    private IEnumerable<uint> GetMarkerTerritories()
+    {
+        var markers = GetFieldMarkers();
+        
+        return Enumerable.Range(0, MarkerCount)
+            .Select(index => markers[index].GetTerritoryId())
+            .Where(territory => territory is not 0)
+            .Distinct();
+    }
+    
     private ZoneMarkerData GetZoneMarkerData(uint targetArea)
     {
         var markers = GetFieldMarkers();
