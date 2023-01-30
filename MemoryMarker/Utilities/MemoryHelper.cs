@@ -91,7 +91,7 @@ public unsafe class MemoryHelper
         var markers = GetFieldMarkers();
         var newZoneData = new ZoneMarkerData
         {
-            MarkerData =  new NamedMarker[MarkerCount],
+            MarkerData = new NamedMarker[MarkerCount],
         };
 
         // Check each of the current waymarks if they match the target TerritoryType

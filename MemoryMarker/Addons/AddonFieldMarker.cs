@@ -136,6 +136,8 @@ public unsafe class AddonFieldMarker : IDisposable
 
     private void RenameContextMenuAction(GameObjectContextMenuItemSelectedArgs args)
     {
+        MemoryHelper.Instance.SaveMarkerData();
+        
         // Check that we have saved config for this territory
         if (Service.Configuration.FieldMarkerData.ContainsKey(Service.ClientState.TerritoryType))
         {
