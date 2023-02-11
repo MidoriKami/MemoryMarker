@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Dalamud.ContextMenu;
+using Dalamud.Game;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Hooking;
@@ -21,14 +22,12 @@ public unsafe class AddonFieldMarker : IDisposable
     private readonly GameObjectContextMenuItem contextMenuItem;
     private static SeString ContextMenuLabel => new(new TextPayload("Rename"));
 
-    [Signature("40 53 48 83 EC 50 F6 81 ?? ?? ?? ?? ?? 48 8B D9 0F 29 74 24 ?? 0F 28 F1 74 7B", DetourName = nameof(Update))]
-    private readonly Hook<Delegates.Addon.Update>? onUpdateHook = null!;
-
+    private Hook<Delegates.Addon.Update>? onUpdateHook;
     private readonly Hook<Delegates.Agent.ReceiveEvent>? onReceiveEventHook;
 
-    private static AtkUnitBase* AddonBase => (AtkUnitBase*) Service.GameGui.GetAddonByName("FieldMarker");
-    private byte SelectedPage => *((byte*)AddonBase + 1408);
-    private int HoveredIndex => *(int*) ((byte*) AddonBase + 1404);
+    private static AtkUnitBase* Addon => (AtkUnitBase*) Service.GameGui.GetAddonByName("FieldMarker");
+    private byte SelectedPage => *((byte*)Addon + 1408);
+    private int HoveredIndex => *(int*) ((byte*) Addon + 1404);
     private int lastHoveredIndex;
     
     public AddonFieldMarker()
@@ -44,7 +43,17 @@ public unsafe class AddonFieldMarker : IDisposable
         onReceiveEventHook ??= Hook<Delegates.Agent.ReceiveEvent>.FromAddress(new nint(agent->VTable->ReceiveEvent), ReceiveEvent);
         onReceiveEventHook.Enable();
         
-        onUpdateHook.Enable();
+        Service.Framework.Update += OnFrameworkUpdate;
+    }
+    
+    private void OnFrameworkUpdate(Framework framework)
+    {
+        if (Addon is null) return;
+
+        onUpdateHook ??= AddonHook.Hook<Delegates.Addon.Update>(Addon, 41, Update);
+        onUpdateHook?.Enable();
+        
+        Service.Framework.Update -= OnFrameworkUpdate;
     }
 
     public void Dispose()
@@ -54,6 +63,8 @@ public unsafe class AddonFieldMarker : IDisposable
         
         onReceiveEventHook?.Dispose();
         onUpdateHook?.Dispose();
+        
+        Service.Framework.Update -= OnFrameworkUpdate;
     }
 
     private nint ReceiveEvent(AgentInterface* agent, nint rawData, AtkValue* args, uint argCount, ulong sender)

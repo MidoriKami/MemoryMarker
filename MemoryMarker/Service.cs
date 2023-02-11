@@ -14,6 +14,7 @@ internal class Service
     [PluginService] public static ClientState ClientState { get; private set; } = null!;
     [PluginService] public static GameGui GameGui { get; private set; } = null!;
     [PluginService] public static SigScanner SigScanner { get; private set; } = null!;
+    [PluginService] public static Framework Framework { get; private set; } = null!;
 
     public static Configuration Configuration { get; set; } = null!;
     public static WaymarkManager WaymarkManager { get; set; } = null!;
