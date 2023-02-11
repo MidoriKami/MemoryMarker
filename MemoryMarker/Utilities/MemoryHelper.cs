@@ -3,7 +3,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using Dalamud.Logging;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
-using KamiLib.Misc;
 using MemoryMarker.DataModels;
 
 namespace MemoryMarker.Utilities;
@@ -19,8 +18,6 @@ public unsafe class MemoryHelper
     
     public void SaveMarkerData()
     {
-        Logging.PrintAddress(FieldMarkers, "MarkersAddress");
-        
         foreach (var territory in GetMarkerTerritories())
         {
             SaveMarkerDataForTerritory(territory);
