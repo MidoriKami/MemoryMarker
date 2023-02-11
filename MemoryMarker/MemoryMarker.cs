@@ -1,4 +1,5 @@
 ﻿using Dalamud.Plugin;
+using FFXIVClientStructs.Interop;
 using KamiLib;
 using MemoryMarker.Addons;
 using MemoryMarker.System;
@@ -13,6 +14,9 @@ public sealed class Plugin : IDalamudPlugin
     {
         pluginInterface.Create<Service>();
         
+        Resolver.GetInstance.SetupSearchSpace(Service.SigScanner.SearchBase);
+        Resolver.GetInstance.Resolve();
+
         KamiCommon.Initialize(pluginInterface, Name, () => Service.Configuration.Save());
         
         Service.Configuration = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();

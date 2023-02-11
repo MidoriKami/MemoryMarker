@@ -1,6 +1,5 @@
 ﻿using System;
 using Dalamud.Logging;
-using Dalamud.Utility.Signatures;
 using MemoryMarker.Utilities;
 
 namespace MemoryMarker.System;
@@ -9,8 +8,6 @@ public class WaymarkManager : IDisposable
 {
     public WaymarkManager()
     {
-        SignatureHelper.Initialise(this);
-
         Service.ClientState.TerritoryChanged += OnZoneChange;
     }
 

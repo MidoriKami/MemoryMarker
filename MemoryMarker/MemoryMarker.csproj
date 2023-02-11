@@ -40,8 +40,8 @@
     <PackageReference Include="Dalamud.ContextMenu" Version="1.2.1" />
     <PackageReference Include="DalamudPackager" Version="2.1.10" />
     <Reference Include="FFXIVClientStructs">
-      <HintPath>$(DalamudLibPath)FFXIVClientStructs.dll</HintPath>
-      <Private>false</Private>
+      <HintPath>D:\Documents\Visual Studio 2022\Repositories\ExternalPlugins\FFXIVClientStructs\bin\Release\FFXIVClientStructs.dll</HintPath>
+      <Private>true</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>$(DalamudLibPath)Newtonsoft.Json.dll</HintPath>

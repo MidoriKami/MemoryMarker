@@ -1,7 +1,14 @@
 ﻿using System;
 using System.Linq;
+using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 
 namespace MemoryMarker.DataModels;
+
+public class NamedMarker
+{
+    public FieldMarkerPreset Marker { get; set; }
+    public string Name = string.Empty;
+}
 
 public class ZoneMarkerData
 {

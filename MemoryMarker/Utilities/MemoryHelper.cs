@@ -2,7 +2,8 @@
 using System.Linq;
 using System.Runtime.InteropServices;
 using Dalamud.Logging;
-using Dalamud.Utility.Signatures;
+using FFXIVClientStructs.FFXIV.Client.UI.Misc;
+using KamiLib.Misc;
 using MemoryMarker.DataModels;
 
 namespace MemoryMarker.Utilities;
@@ -12,39 +13,14 @@ public unsafe class MemoryHelper
     private static MemoryHelper? _instance;
     public static MemoryHelper Instance => _instance ??= new MemoryHelper();
 
-    private delegate nint GetFieldMarkerDataSection(nint pConfigFile = 0, byte sectionIndex = 0x11);
-    private delegate FieldMarkerStruct* GetFieldMarkerData(nint uiSaveSegmentAddress, int slot);
-
-    [Signature("40 53 48 83 EC 20 48 8B 0D ?? ?? ?? ?? 0F B7 DA E8 ?? ?? ?? ?? 4C 8B C0")]
-    private readonly GetFieldMarkerDataSection? getUiSaveSegmentAddress = null;
-
-    [Signature("4C 8B C9 85 D2 78 0A")] 
-    private readonly GetFieldMarkerData? getFieldMarkerPresetForSlot = null;
-
+    private FieldMarkerModule* FieldMarkers => FieldMarkerModule.Instance();
+    
     private const int MarkerCount = 30;
-
-    private MemoryHelper()
-    {
-        SignatureHelper.Initialise(this);
-    }
-
-    private FieldMarkerStruct* GetFieldMarker(int slot)
-    {
-        var segmentAddress = getUiSaveSegmentAddress?.Invoke();
-        if (segmentAddress is null) return null;
-        
-        if (getFieldMarkerPresetForSlot is null) return null;
-        
-        return getFieldMarkerPresetForSlot.Invoke(segmentAddress.Value, slot);
-    }
-
-    private FieldMarkerStruct[] GetFieldMarkers()
-    {
-        return Enumerable.Range(0, MarkerCount).Select(i => *GetFieldMarker(i)).ToArray();
-    }
-
+    
     public void SaveMarkerData()
     {
+        Logging.PrintAddress(FieldMarkers, "MarkersAddress");
+        
         foreach (var territory in GetMarkerTerritories())
         {
             SaveMarkerDataForTerritory(territory);
@@ -78,17 +54,15 @@ public unsafe class MemoryHelper
 
     private IEnumerable<uint> GetMarkerTerritories()
     {
-        var markers = GetFieldMarkers();
-        
         return Enumerable.Range(0, MarkerCount)
-            .Select(index => markers[index].GetTerritoryId())
+            .Select(index => FieldMarkers->PresetArraySpan[index].GetTerritoryId())
             .Where(territory => territory is not 0)
             .Distinct();
     }
     
     private ZoneMarkerData GetZoneMarkerData(uint targetArea)
     {
-        var markers = GetFieldMarkers();
+        var markers = FieldMarkers->PresetArraySpan;
         var newZoneData = new ZoneMarkerData
         {
             MarkerData = new NamedMarker[MarkerCount],
@@ -114,15 +88,15 @@ public unsafe class MemoryHelper
         foreach (var index in Enumerable.Range(0, data.MarkerData.Length))
         {
             var savedMarker = data.MarkerData[index]?.Marker;
-            var targetAddress = GetFieldMarker(index);
+            var targetAddress = (FieldMarkerPreset*)FieldMarkers->PresetArray + index;
             
             if (savedMarker is null)
             {
-                Marshal.Copy(new byte[sizeof(FieldMarkerStruct)], 0, (nint)targetAddress, sizeof(FieldMarkerStruct));
+                Marshal.Copy(new byte[sizeof(FieldMarkerPreset)], 0, (nint)targetAddress, sizeof(FieldMarkerPreset));
             }
             else
             {
-                Marshal.StructureToPtr(savedMarker, (nint) targetAddress, false);
+                Marshal.StructureToPtr(savedMarker, (nint)targetAddress, false);
             }
         }
     }
@@ -131,9 +105,9 @@ public unsafe class MemoryHelper
     {
         foreach (var index in Enumerable.Range(0, MarkerCount))
         {
-            var targetAddress = GetFieldMarker(index);
+            var targetAddress = (FieldMarkerPreset*)FieldMarkers->PresetArray + index;
             
-            Marshal.Copy(new byte[sizeof(FieldMarkerStruct)], 0, (nint)targetAddress, sizeof(FieldMarkerStruct));
+            Marshal.Copy(new byte[sizeof(FieldMarkerPreset)], 0, (nint)targetAddress, sizeof(FieldMarkerPreset));
         }
     }
 }
