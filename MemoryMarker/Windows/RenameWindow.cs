@@ -54,7 +54,11 @@ public class RenameWindow : Window
         var region = ImGui.GetContentRegionAvail();
         SetFocus();
         ImGui.SetNextItemWidth(region.X);
-        ImGui.InputText("###RenameTextInput", ref setting.Name, 35, ImGuiInputTextFlags.AutoSelectAll);
+        if (ImGui.InputText("###RenameTextInput", ref setting.Name, 35, ImGuiInputTextFlags.AutoSelectAll | ImGuiInputTextFlags.EnterReturnsTrue))
+        {
+            Service.Configuration.Save();
+            IsOpen = false;
+        }
 
         ImGuiHelpers.ScaledDummy(10.0f);
         var buttonSize = ImGuiHelpers.ScaledVector2(100.0f, 23.0f);
