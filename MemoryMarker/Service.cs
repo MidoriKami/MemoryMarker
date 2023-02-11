@@ -18,5 +18,5 @@ internal class Service
 
     public static Configuration Configuration { get; set; } = null!;
     public static WaymarkManager WaymarkManager { get; set; } = null!;
-    public static AddonFieldMarker AddonFieldMarker { get; set; } = null!;
+    public static FieldMarkerWindow FieldMarkerWindow { get; set; } = null!;
 }

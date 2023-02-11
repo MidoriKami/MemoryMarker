@@ -27,6 +27,14 @@ public unsafe class MemoryHelper
         }
     }
     
+    private IEnumerable<uint> GetMarkerTerritories()
+    {
+        return Enumerable.Range(0, MarkerCount)
+            .Select(index => FieldMarkers->PresetArraySpan[index].GetTerritoryId())
+            .Where(territory => territory is not 0)
+            .Distinct();
+    }
+    
     private void SaveMarkerDataForTerritory(uint targetArea)
     {
         // If we have saved markers
@@ -50,14 +58,6 @@ public unsafe class MemoryHelper
                 PluginLog.Debug($"[Territory: {targetArea}] Saving Waymarks, Count: {Service.Configuration.FieldMarkerData[targetArea].GetMarkerCount()}");
             }
         } 
-    }
-
-    private IEnumerable<uint> GetMarkerTerritories()
-    {
-        return Enumerable.Range(0, MarkerCount)
-            .Select(index => FieldMarkers->PresetArraySpan[index].GetTerritoryId())
-            .Where(territory => territory is not 0)
-            .Distinct();
     }
     
     private ZoneMarkerData GetZoneMarkerData(uint targetArea)
