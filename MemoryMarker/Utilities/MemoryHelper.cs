@@ -12,7 +12,7 @@ public unsafe class MemoryHelper
     private static MemoryHelper? _instance;
     public static MemoryHelper Instance => _instance ??= new MemoryHelper();
 
-    private FieldMarkerModule* FieldMarkers => FieldMarkerModule.Instance();
+    private static FieldMarkerModule* FieldMarkers => FieldMarkerModule.Instance();
     
     private const int MarkerCount = 30;
     
@@ -80,7 +80,7 @@ public unsafe class MemoryHelper
         return newZoneData;
     }
 
-    public void SetZoneMarkerData(ZoneMarkerData data)
+    public static void SetZoneMarkerData(ZoneMarkerData data)
     {
         foreach (var index in Enumerable.Range(0, data.MarkerData.Length))
         {
@@ -98,7 +98,7 @@ public unsafe class MemoryHelper
         }
     }
 
-    public void ClearZoneMarkerData()
+    public static void ClearZoneMarkerData()
     {
         foreach (var index in Enumerable.Range(0, MarkerCount))
         {

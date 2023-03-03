@@ -37,14 +37,14 @@ public class WaymarkManager : IDisposable
         // If we have saved markers
         if (Service.Configuration.FieldMarkerData.TryGetValue(territoryType, out var markers))
         {
-            MemoryHelper.Instance.SetZoneMarkerData(markers);
+            MemoryHelper.SetZoneMarkerData(markers);
             PluginLog.Debug($"Marker data found for zone {territoryType}, loading");
         }
         
         // If not lets clear invalid marker data
         else
         {
-            MemoryHelper.Instance.ClearZoneMarkerData();
+            MemoryHelper.ClearZoneMarkerData();
             PluginLog.Debug($"Marker data not found, clearing waymarks");
         }
     }

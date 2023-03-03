@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-	<AssemblyVersion>0.1.0.2</AssemblyVersion>
+	<AssemblyVersion>1.0.0.0</AssemblyVersion>
     <PackageProjectUrl>https://github.com/MidoriKami/MemoryMarker</PackageProjectUrl>
   </PropertyGroup>
 
@@ -40,8 +40,8 @@
     <PackageReference Include="Dalamud.ContextMenu" Version="1.2.1" />
     <PackageReference Include="DalamudPackager" Version="2.1.10" />
     <Reference Include="FFXIVClientStructs">
-      <HintPath>D:\Documents\Visual Studio 2022\Repositories\ExternalPlugins\FFXIVClientStructs\bin\Release\FFXIVClientStructs.dll</HintPath>
-      <Private>true</Private>
+      <HintPath>$(DalamudLibPath)FFXIVClientStructs.dll</HintPath>
+      <Private>false</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>$(DalamudLibPath)Newtonsoft.Json.dll</HintPath>
