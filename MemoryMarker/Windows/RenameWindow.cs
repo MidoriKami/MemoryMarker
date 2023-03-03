@@ -2,14 +2,16 @@
 using Dalamud.Interface;
 using Dalamud.Interface.Internal.Notifications;
 using Dalamud.Interface.Windowing;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using ImGuiNET;
 using KamiLib;
 
 namespace MemoryMarker.Windows;
 
-public class RenameWindow : Window
+public unsafe class RenameWindow : Window
 {
     private static RenameWindow? _instance;
+    private AgentFieldMarker* AgentFieldMarker => (AgentFieldMarker*) AgentModule.Instance()->GetAgentByInternalId(AgentId.FieldMarker);
 
     private readonly int slotIndex;
 
@@ -46,7 +48,7 @@ public class RenameWindow : Window
 
         if (setting.Name == string.Empty)
         {
-            setting.Name = Service.AddonFieldMarker.GetTooltipFirstLine();
+            setting.Name = AgentFieldMarker->PresetLabelsSpan[slotIndex].ToString();
         }
         
         ImGuiHelpers.ScaledDummy(10.0f);
@@ -54,7 +56,11 @@ public class RenameWindow : Window
         var region = ImGui.GetContentRegionAvail();
         SetFocus();
         ImGui.SetNextItemWidth(region.X);
-        ImGui.InputText("###RenameTextInput", ref setting.Name, 35, ImGuiInputTextFlags.AutoSelectAll);
+        if (ImGui.InputText("###RenameTextInput", ref setting.Name, 35, ImGuiInputTextFlags.AutoSelectAll | ImGuiInputTextFlags.EnterReturnsTrue))
+        {
+            Service.Configuration.Save();
+            IsOpen = false;
+        }
 
         ImGuiHelpers.ScaledDummy(10.0f);
         var buttonSize = ImGuiHelpers.ScaledVector2(100.0f, 23.0f);

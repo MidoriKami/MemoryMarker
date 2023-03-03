@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Linq;
 using Dalamud.ContextMenu;
+using Dalamud.Game;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Hooking;
 using Dalamud.Utility.Signatures;
-using FFXIVClientStructs.FFXIV.Client.System.String;
+using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using KamiLib.Atk;
@@ -15,23 +16,21 @@ using MemoryMarker.Windows;
 
 namespace MemoryMarker.Addons;
 
-public unsafe class AddonFieldMarker : IDisposable
+public unsafe class FieldMarkerWindow : IDisposable
 {
     private readonly DalamudContextMenu contextMenu;
     private readonly GameObjectContextMenuItem contextMenuItem;
     private static SeString ContextMenuLabel => new(new TextPayload("Rename"));
 
-    [Signature("40 53 48 83 EC 50 F6 81 ?? ?? ?? ?? ?? 48 8B D9 0F 29 74 24 ?? 0F 28 F1 74 7B", DetourName = nameof(Update))]
-    private readonly Hook<Delegates.Addon.Update>? onUpdateHook = null!;
-
+    private Hook<Delegates.Addon.Update>? onUpdateHook;
     private readonly Hook<Delegates.Agent.ReceiveEvent>? onReceiveEventHook;
 
-    private static AtkUnitBase* AddonBase => (AtkUnitBase*) Service.GameGui.GetAddonByName("FieldMarker");
-    private byte SelectedPage => *((byte*)AddonBase + 1408);
-    private int HoveredIndex => *(int*) ((byte*) AddonBase + 1404);
+    private static AddonFieldMarker* Addon => (AddonFieldMarker*) Service.GameGui.GetAddonByName("FieldMarker");
+    private byte SelectedPage => Addon->SelectedPage;
+    private int HoveredIndex => Addon->HoveredPresetIndex;
     private int lastHoveredIndex;
     
-    public AddonFieldMarker()
+    public FieldMarkerWindow()
     {
         SignatureHelper.Initialise(this);
         
@@ -44,7 +43,17 @@ public unsafe class AddonFieldMarker : IDisposable
         onReceiveEventHook ??= Hook<Delegates.Agent.ReceiveEvent>.FromAddress(new nint(agent->VTable->ReceiveEvent), ReceiveEvent);
         onReceiveEventHook.Enable();
         
-        onUpdateHook.Enable();
+        Service.Framework.Update += OnFrameworkUpdate;
+    }
+    
+    private void OnFrameworkUpdate(Framework framework)
+    {
+        if (Addon is null) return;
+    
+        onUpdateHook ??= AddonHook.Hook<Delegates.Addon.Update>(Addon, 41, Update);
+        onUpdateHook?.Enable();
+        
+        Service.Framework.Update -= OnFrameworkUpdate;
     }
 
     public void Dispose()
@@ -54,6 +63,8 @@ public unsafe class AddonFieldMarker : IDisposable
         
         onReceiveEventHook?.Dispose();
         onUpdateHook?.Dispose();
+        
+        Service.Framework.Update -= OnFrameworkUpdate;
     }
 
     private nint ReceiveEvent(AgentInterface* agent, nint rawData, AtkValue* args, uint argCount, ulong sender)
@@ -84,16 +95,16 @@ public unsafe class AddonFieldMarker : IDisposable
     private byte Update(AtkUnitBase* addon)
     {
         var result = onUpdateHook!.Original(addon);
-
+    
         Safety.ExecuteSafe(() =>
         {
             var baseNode = new BaseNode("FieldMarker");
-
+    
             if (HoveredIndex != -1)
             {
                 lastHoveredIndex = HoveredIndex;
             }
-
+    
             if (Service.Configuration.FieldMarkerData.ContainsKey(Service.ClientState.TerritoryType))
             {
                 foreach (var index in Enumerable.Range(0, 5))
@@ -102,7 +113,7 @@ public unsafe class AddonFieldMarker : IDisposable
                     // The "update slot" buttons are between these indexes, we don't care about that button
                     var nodeIndex = (uint)(21 + index * 2);
                     var settingIndex = index + 5 * SelectedPage;
-
+    
                     if (Service.Configuration.FieldMarkerData[Service.ClientState.TerritoryType].MarkerData[settingIndex] is { } markerData)
                     {
                         // If we have string data for this node, set it, if not, let the game write whatever it would normally write.
@@ -123,7 +134,7 @@ public unsafe class AddonFieldMarker : IDisposable
                 }
             }
         });
-
+    
         return result;
     }
     
@@ -148,29 +159,5 @@ public unsafe class AddonFieldMarker : IDisposable
                 RenameWindow.ShowWindow(settingIndex);
             }
         }
-    }
-    
-    private string? GetTooltipText()
-    {
-        var fieldMarkerAgent = AgentModule.Instance()->GetAgentByInternalId(AgentId.FieldMarker);
-        var tooltipStringPointer = (Utf8String*)((byte*) fieldMarkerAgent + 3184);
-        if (tooltipStringPointer->IsEmpty != 0) return null;
-
-        return tooltipStringPointer->ToString();
-    }
-
-    public string GetTooltipFirstLine()
-    {
-        var fullTooltip = GetTooltipText();
-        if (fullTooltip is null) throw new Exception("Something went wrong, this should only get called when renaming a valid preset.");
-
-        var splits = fullTooltip.Split("\n");
-        
-        var firstLine = splits.FirstOrDefault();
-        if (firstLine is null) throw new FormatException("Failed to parse tooltip text.");
-
-        var firstSpaceIndex = firstLine.IndexOf(" ", StringComparison.Ordinal) + 1;
-
-        return firstLine[firstSpaceIndex..];
     }
 }

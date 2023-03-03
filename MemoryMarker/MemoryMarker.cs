@@ -19,7 +19,7 @@ public sealed class Plugin : IDalamudPlugin
         Service.Configuration.Initialize(pluginInterface);
 
         Service.WaymarkManager = new WaymarkManager();
-        Service.AddonFieldMarker = new AddonFieldMarker();
+        Service.FieldMarkerWindow = new FieldMarkerWindow();
     }
 
     public void Dispose()
@@ -27,6 +27,6 @@ public sealed class Plugin : IDalamudPlugin
         KamiCommon.Dispose();
         
         Service.WaymarkManager.Dispose();
-        Service.AddonFieldMarker.Dispose();
+        Service.FieldMarkerWindow.Dispose();
     }
 }
