@@ -9,7 +9,6 @@ using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using KamiLib.Atk;
 using KamiLib.Hooking;
 using MemoryMarker.Utilities;
 using MemoryMarker.Windows;
@@ -73,19 +72,10 @@ public unsafe class FieldMarkerWindow : IDisposable
         
         Safety.ExecuteSafe(() =>
         {
-            // Fallthrough switch to make logic more clear
-            switch (args[0].Int)
+            // Save Markers if any event other than mouseover occured
+            if (!(sender is 0 && args[0].Int is 5))
             {
-                // Preset Button is LeftClicked
-                case 2:
-                    
-                // Window is closed    
-                case -1 or -2:
-                    
-                // Preset is deleted or overwritten    
-                case 0 when argCount is 5:
-                    MemoryHelper.Instance.SaveMarkerData();
-                    break;
+                MemoryHelper.Instance.SaveMarkerData();
             }
         });
 
@@ -98,8 +88,6 @@ public unsafe class FieldMarkerWindow : IDisposable
     
         Safety.ExecuteSafe(() =>
         {
-            var baseNode = new BaseNode("FieldMarker");
-    
             if (HoveredIndex != -1)
             {
                 lastHoveredIndex = HoveredIndex;
@@ -117,7 +105,8 @@ public unsafe class FieldMarkerWindow : IDisposable
                     if (Service.Configuration.FieldMarkerData[Service.ClientState.TerritoryType].MarkerData[settingIndex] is { } markerData)
                     {
                         // If we have string data for this node, set it, if not, let the game write whatever it would normally write.
-                        var textNode = baseNode.GetComponentNode(nodeIndex).GetNode<AtkTextNode>(5);
+                        var textNode = Addon->AtkUnitBase.GetButtonNodeById(nodeIndex)->ButtonTextNode;
+                        
                         if (markerData.Name != string.Empty)
                         {
                             textNode->SetText($"{settingIndex + 1}. {markerData.Name}");
@@ -128,7 +117,7 @@ public unsafe class FieldMarkerWindow : IDisposable
                     // this causes the game to show the subtle + marker
                     else
                     {
-                        var textNode = baseNode.GetComponentNode(nodeIndex).GetNode<AtkTextNode>(5);
+                        var textNode = Addon->AtkUnitBase.GetButtonNodeById(nodeIndex)->ButtonTextNode;
                         textNode->SetText(string.Empty);
                     }
                 }
