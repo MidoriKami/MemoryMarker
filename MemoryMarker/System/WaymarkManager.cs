@@ -38,14 +38,14 @@ public class WaymarkManager : IDisposable
         if (Service.Configuration.FieldMarkerData.TryGetValue(territoryType, out var markers))
         {
             MemoryHelper.SetZoneMarkerData(markers);
-            PluginLog.Debug($"Marker data found for zone {territoryType}, loading");
+            PluginLog.Debug($"[Territory: {territoryType}] Loading Waymarks, Count: {markers.GetMarkerCount()}");
         }
         
         // If not lets clear invalid marker data
         else
         {
             MemoryHelper.ClearZoneMarkerData();
-            PluginLog.Debug($"Marker data not found, clearing waymarks");
+            PluginLog.Debug($"[Territory: {territoryType}] No Markers for Zone, clearing waymarks");
         }
     }
 }

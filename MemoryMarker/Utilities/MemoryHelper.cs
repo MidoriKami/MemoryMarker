@@ -41,7 +41,7 @@ public unsafe class MemoryHelper
             var markers = GetZoneMarkerData(targetArea);
             value.UpdateMarkerData(markers.MarkerData);
             Service.Configuration.Save();
-            PluginLog.Debug($"[Territory: {targetArea}] Saving Waymarks, Count: {Service.Configuration.FieldMarkerData[targetArea].GetMarkerCount()}");
+            PluginLog.Debug($"[Territory: {targetArea}] Saving Waymarks,  Count: {Service.Configuration.FieldMarkerData[targetArea].GetMarkerCount()}");
         }
         else
         {
@@ -52,7 +52,7 @@ public unsafe class MemoryHelper
             {
                 Service.Configuration.FieldMarkerData.Add(targetArea, markers);
                 Service.Configuration.Save();
-                PluginLog.Debug($"[Territory: {targetArea}] Saving Waymarks, Count: {Service.Configuration.FieldMarkerData[targetArea].GetMarkerCount()}");
+                PluginLog.Debug($"[Territory: {targetArea}] Saving Waymarks,  Count: {Service.Configuration.FieldMarkerData[targetArea].GetMarkerCount()}");
             }
         } 
     }
