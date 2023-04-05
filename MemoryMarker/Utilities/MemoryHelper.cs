@@ -18,18 +18,9 @@ public unsafe class MemoryHelper
     
     public void SaveMarkerData()
     {
-        var territories = GetMarkerTerritories().ToList();
-
-        if (territories.Count is 0)
+        foreach (var territory in GetMarkerTerritories())
         {
-            SaveMarkerDataForTerritory(Service.ClientState.TerritoryType, false);
-        }
-        else
-        {
-            foreach (var territory in GetMarkerTerritories())
-            {
-                SaveMarkerDataForTerritory(territory);
-            }
+            SaveMarkerDataForTerritory(territory);
         }
     }
     
@@ -40,8 +31,8 @@ public unsafe class MemoryHelper
             .Where(territory => territory is not 0)
             .Distinct();
     }
-
-    private void SaveMarkerDataForTerritory(uint targetArea, bool createIfNotFound = true)
+    
+    private void SaveMarkerDataForTerritory(uint targetArea)
     {
         // If we have saved markers
         if (Service.Configuration.FieldMarkerData.TryGetValue(targetArea, out var value))
@@ -52,7 +43,7 @@ public unsafe class MemoryHelper
             Service.Configuration.Save();
             PluginLog.Debug($"[Territory: {targetArea}] Saving Waymarks, Count: {Service.Configuration.FieldMarkerData[targetArea].GetMarkerCount()}");
         }
-        else if (createIfNotFound)
+        else
         {
             // Create and Save Markers
             var markers = GetZoneMarkerData(targetArea);
