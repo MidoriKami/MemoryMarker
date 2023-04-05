@@ -48,7 +48,7 @@ public unsafe class RenameWindow : Window
 
         if (setting.Name == string.Empty)
         {
-            setting.Name = AgentFieldMarker->PresetLabelsSpan[slotIndex].ToString();
+            setting.Name = AgentFieldMarker->PresetLabelsSpan[slotIndex].ToString().Split(" ")[1];
         }
         
         ImGuiHelpers.ScaledDummy(10.0f);
