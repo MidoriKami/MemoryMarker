@@ -102,11 +102,11 @@ public unsafe class FieldMarkerWindow : IDisposable
                     var nodeIndex = (uint)(21 + index * 2);
                     var settingIndex = index + 5 * SelectedPage;
     
+                    var textNode = Addon->AtkUnitBase.GetButtonNodeById(nodeIndex)->ButtonTextNode;
+                    
                     if (Service.Configuration.FieldMarkerData[Service.ClientState.TerritoryType].MarkerData[settingIndex] is { } markerData)
                     {
                         // If we have string data for this node, set it, if not, let the game write whatever it would normally write.
-                        var textNode = Addon->AtkUnitBase.GetButtonNodeById(nodeIndex)->ButtonTextNode;
-                        
                         if (markerData.Name != string.Empty)
                         {
                             textNode->SetText($"{settingIndex + 1}. {markerData.Name}");
@@ -117,7 +117,6 @@ public unsafe class FieldMarkerWindow : IDisposable
                     // this causes the game to show the subtle + marker
                     else
                     {
-                        var textNode = Addon->AtkUnitBase.GetButtonNodeById(nodeIndex)->ButtonTextNode;
                         textNode->SetText(string.Empty);
                     }
                 }
