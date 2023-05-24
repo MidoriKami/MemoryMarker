@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-	<AssemblyVersion>1.0.0.2</AssemblyVersion>
+	<AssemblyVersion>1.0.0.3</AssemblyVersion>
     <PackageProjectUrl>https://github.com/MidoriKami/MemoryMarker</PackageProjectUrl>
   </PropertyGroup>
 
@@ -37,7 +37,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dalamud.ContextMenu" Version="1.2.1" />
+    <PackageReference Include="Dalamud.ContextMenu" Version="1.2.3" />
     <PackageReference Include="DalamudPackager" Version="2.1.10" />
     <Reference Include="FFXIVClientStructs">
       <HintPath>$(DalamudLibPath)FFXIVClientStructs.dll</HintPath>
