@@ -93,7 +93,7 @@ public unsafe class FieldMarkerWindow : IDisposable
                 lastHoveredIndex = HoveredIndex;
             }
     
-            if (Service.Configuration.FieldMarkerData.ContainsKey(Service.ClientState.TerritoryType))
+            if (Service.Configuration.FieldMarkerData.TryGetValue(Service.ClientState.TerritoryType, out var value))
             {
                 foreach (var index in Enumerable.Range(0, 5))
                 {
@@ -104,7 +104,7 @@ public unsafe class FieldMarkerWindow : IDisposable
     
                     var textNode = Addon->AtkUnitBase.GetButtonNodeById(nodeIndex)->ButtonTextNode;
                     
-                    if (Service.Configuration.FieldMarkerData[Service.ClientState.TerritoryType].MarkerData[settingIndex] is { } markerData)
+                    if (value.MarkerData[settingIndex] is { } markerData)
                     {
                         // If we have string data for this node, set it, if not, let the game write whatever it would normally write.
                         if (markerData.Name != string.Empty)
@@ -138,11 +138,11 @@ public unsafe class FieldMarkerWindow : IDisposable
         MemoryHelper.Instance.SaveMarkerData();
         
         // Check that we have saved config for this territory
-        if (Service.Configuration.FieldMarkerData.ContainsKey(Service.ClientState.TerritoryType))
+        if (Service.Configuration.FieldMarkerData.TryGetValue(Service.ClientState.TerritoryType, out var value))
         {
             // Check that the preset we are modifying exists
             var settingIndex = lastHoveredIndex + 5 * SelectedPage;
-            if (Service.Configuration.FieldMarkerData[Service.ClientState.TerritoryType].MarkerData[settingIndex] is not null)
+            if (value.MarkerData[settingIndex] is not null)
             {
                 RenameWindow.ShowWindow(settingIndex);
             }
