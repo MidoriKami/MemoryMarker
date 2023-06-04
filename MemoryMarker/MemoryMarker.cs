@@ -27,6 +27,7 @@ public sealed class Plugin : IDalamudPlugin
     {
         KamiCommon.Dispose();
         
+        Service.FontManager.Dispose();
         Service.WaymarkManager.Dispose();
         Service.FieldMarkerWindow.Dispose();
     }
