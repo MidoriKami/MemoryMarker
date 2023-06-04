@@ -18,6 +18,7 @@ public sealed class Plugin : IDalamudPlugin
         Service.Configuration = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
         Service.Configuration.Initialize(pluginInterface);
 
+        Service.FontManager = new FontManager();
         Service.WaymarkManager = new WaymarkManager();
         Service.FieldMarkerWindow = new FieldMarkerWindow();
     }

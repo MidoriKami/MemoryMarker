@@ -17,5 +17,6 @@ internal class Service
 
     public static Configuration Configuration { get; set; } = null!;
     public static WaymarkManager WaymarkManager { get; set; } = null!;
+    public static FontManager FontManager { get; set; } = null!;
     public static FieldMarkerWindow FieldMarkerWindow { get; set; } = null!;
 }

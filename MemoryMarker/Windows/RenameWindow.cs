@@ -1,4 +1,6 @@
 ﻿using System.Numerics;
+using System.Text;
+using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Interface;
 using Dalamud.Interface.Internal.Notifications;
 using Dalamud.Interface.Windowing;
@@ -49,7 +51,8 @@ public unsafe class RenameWindow : Window
         if (setting.Name == string.Empty)
         {
             var name = AgentFieldMarker->PresetLabelsSpan[slotIndex].ToString();
-            setting.Name = name[(name.IndexOf(' ') + 1)..];
+            var filteredString = name[(name.IndexOf(' ') + 1)..];
+            setting.Name = SeString.Parse(Encoding.UTF8.GetBytes(filteredString)).ToString();
         }
         
         ImGuiHelpers.ScaledDummy(10.0f);
@@ -57,11 +60,13 @@ public unsafe class RenameWindow : Window
         var region = ImGui.GetContentRegionAvail();
         SetFocus();
         ImGui.SetNextItemWidth(region.X);
+        ImGui.PushFont(Service.FontManager.Axis12.ImFont);
         if (ImGui.InputText("###RenameTextInput", ref setting.Name, 35, ImGuiInputTextFlags.AutoSelectAll | ImGuiInputTextFlags.EnterReturnsTrue))
         {
             Service.Configuration.Save();
             IsOpen = false;
         }
+        ImGui.PopFont();
 
         ImGuiHelpers.ScaledDummy(10.0f);
         var buttonSize = ImGuiHelpers.ScaledVector2(100.0f, 23.0f);
