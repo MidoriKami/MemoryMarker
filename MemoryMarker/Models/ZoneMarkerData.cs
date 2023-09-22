@@ -6,14 +6,17 @@ namespace MemoryMarker.DataModels;
 
 public class NamedMarker
 {
-    public FieldMarkerPreset Marker { get; set; }
     public string Name = string.Empty;
+    public FieldMarkerPreset Marker { get; set; }
 }
 
 public class ZoneMarkerData
 {
     public NamedMarker?[] MarkerData { get; init; } = null!;
-    public int GetMarkerCount() => MarkerData.Where(marker => marker is not null).Count();
+    public int GetMarkerCount()
+    {
+        return MarkerData.Where(marker => marker is not null).Count();
+    }
 
     /// <summary>
     /// Updates MarkerData Array without changing Marker Names
@@ -33,17 +36,17 @@ public class ZoneMarkerData
             {
                 namedMarker.Marker = newMarker.Marker;
             }
-            
+
             // If we don't have a entry for this value, make one
             else if (namedMarker is null && newMarker is not null)
             {
                 MarkerData[index] = new NamedMarker
                 {
                     Marker = newMarker.Marker,
-                    Name = string.Empty,
+                    Name = string.Empty
                 };
             }
-            
+
             // If we do have an entry, but the new data is blank, clear our entry
             else if (namedMarker is not null && newMarker is null)
             {

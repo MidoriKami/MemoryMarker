@@ -1,21 +1,21 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-using Dalamud.Logging;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
+using MemoryMarker.Controllers;
 using MemoryMarker.DataModels;
 
 namespace MemoryMarker.Utilities;
 
 public unsafe class MemoryHelper
 {
+    private const int MarkerCount = 30;
+
     private static MemoryHelper? _instance;
     public static MemoryHelper Instance => _instance ??= new MemoryHelper();
 
     private static FieldMarkerModule* FieldMarkers => FieldMarkerModule.Instance();
-    
-    private const int MarkerCount = 30;
-    
+
     public void SaveMarkerData()
     {
         foreach (var territory in GetMarkerTerritories())
@@ -23,7 +23,7 @@ public unsafe class MemoryHelper
             SaveMarkerDataForTerritory(territory);
         }
     }
-    
+
     private IEnumerable<uint> GetMarkerTerritories()
     {
         return Enumerable.Range(0, MarkerCount)
@@ -31,17 +31,17 @@ public unsafe class MemoryHelper
             .Where(territory => territory is not 0)
             .Distinct();
     }
-    
+
     private void SaveMarkerDataForTerritory(uint targetArea)
     {
         // If we have saved markers
-        if (Service.Configuration.FieldMarkerData.TryGetValue(targetArea, out var value))
+        if (MemoryMarkerSystem.Configuration.FieldMarkerData.TryGetValue(targetArea, out var value))
         {
             // Overwrite Existing Markers
             var markers = GetZoneMarkerData(targetArea);
             value.UpdateMarkerData(markers.MarkerData);
-            Service.Configuration.Save();
-            PluginLog.Debug($"[Territory: {targetArea}] Saving Waymarks,  Count: {Service.Configuration.FieldMarkerData[targetArea].GetMarkerCount()}");
+            MemoryMarkerSystem.Configuration.Save();
+            Service.Log.Debug($"[Territory: {targetArea}] Saving Waymarks,  Count: {MemoryMarkerSystem.Configuration.FieldMarkerData[targetArea].GetMarkerCount()}");
         }
         else
         {
@@ -50,19 +50,19 @@ public unsafe class MemoryHelper
 
             if (markers.GetMarkerCount() > 0)
             {
-                Service.Configuration.FieldMarkerData.Add(targetArea, markers);
-                Service.Configuration.Save();
-                PluginLog.Debug($"[Territory: {targetArea}] Saving Waymarks,  Count: {Service.Configuration.FieldMarkerData[targetArea].GetMarkerCount()}");
+                MemoryMarkerSystem.Configuration.FieldMarkerData.Add(targetArea, markers);
+                MemoryMarkerSystem.Configuration.Save();
+                Service.Log.Debug($"[Territory: {targetArea}] Saving Waymarks,  Count: {MemoryMarkerSystem.Configuration.FieldMarkerData[targetArea].GetMarkerCount()}");
             }
-        } 
+        }
     }
-    
+
     private ZoneMarkerData GetZoneMarkerData(uint targetArea)
     {
         var markers = FieldMarkers->PresetArraySpan;
         var newZoneData = new ZoneMarkerData
         {
-            MarkerData = new NamedMarker[MarkerCount],
+            MarkerData = new NamedMarker[MarkerCount]
         };
 
         // Check each of the current waymarks if they match the target TerritoryType
@@ -73,11 +73,16 @@ public unsafe class MemoryHelper
             newZoneData.MarkerData[index] = new NamedMarker
             {
                 Marker = markers[index],
-                Name = string.Empty,
+                Name = string.Empty
             };
         }
 
         return newZoneData;
+    }
+
+    public static FieldMarkerPreset GetPresetForIndex(int index)
+    {
+        return FieldMarkers->PresetArraySpan[index];
     }
 
     public static void SetZoneMarkerData(ZoneMarkerData data)
@@ -85,15 +90,15 @@ public unsafe class MemoryHelper
         foreach (var index in Enumerable.Range(0, data.MarkerData.Length))
         {
             var savedMarker = data.MarkerData[index]?.Marker;
-            var targetAddress = (FieldMarkerPreset*)FieldMarkers->PresetArray + index;
-            
+            var targetAddress = (FieldMarkerPreset*) FieldMarkers->PresetArray + index;
+
             if (savedMarker is null)
             {
-                Marshal.Copy(new byte[sizeof(FieldMarkerPreset)], 0, (nint)targetAddress, sizeof(FieldMarkerPreset));
+                Marshal.Copy(new byte[sizeof(FieldMarkerPreset)], 0, (nint) targetAddress, sizeof(FieldMarkerPreset));
             }
             else
             {
-                Marshal.StructureToPtr(savedMarker, (nint)targetAddress, false);
+                Marshal.StructureToPtr(savedMarker, (nint) targetAddress, false);
             }
         }
     }
@@ -102,9 +107,9 @@ public unsafe class MemoryHelper
     {
         foreach (var index in Enumerable.Range(0, MarkerCount))
         {
-            var targetAddress = (FieldMarkerPreset*)FieldMarkers->PresetArray + index;
-            
-            Marshal.Copy(new byte[sizeof(FieldMarkerPreset)], 0, (nint)targetAddress, sizeof(FieldMarkerPreset));
+            var targetAddress = (FieldMarkerPreset*) FieldMarkers->PresetArray + index;
+
+            Marshal.Copy(new byte[sizeof(FieldMarkerPreset)], 0, (nint) targetAddress, sizeof(FieldMarkerPreset));
         }
     }
 }

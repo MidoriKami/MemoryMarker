@@ -1,22 +1,15 @@
-﻿using Dalamud.Game;
-using Dalamud.Game.ClientState;
-using Dalamud.Game.Gui;
-using Dalamud.IoC;
+﻿using Dalamud.IoC;
 using Dalamud.Plugin;
-using MemoryMarker.Addons;
-using MemoryMarker.System;
+using Dalamud.Plugin.Services;
 
 namespace MemoryMarker;
 
 internal class Service
 {
-    [PluginService] public static DalamudPluginInterface PluginInterface { get; private set; } = null!;
-    [PluginService] public static ClientState ClientState { get; private set; } = null!;
-    [PluginService] public static GameGui GameGui { get; private set; } = null!;
-    [PluginService] public static Framework Framework { get; private set; } = null!;
-
-    public static Configuration Configuration { get; set; } = null!;
-    public static WaymarkManager WaymarkManager { get; set; } = null!;
-    public static FontManager FontManager { get; set; } = null!;
-    public static FieldMarkerWindow FieldMarkerWindow { get; set; } = null!;
+    [PluginService] public static DalamudPluginInterface PluginInterface { get; set; } = null!;
+    [PluginService] public static IClientState ClientState { get; set; } = null!;
+    [PluginService] public static IGameGui GameGui { get; set; } = null!;
+    [PluginService] public static IAddonLifecycle AddonLifecycle { get; set; } = null!;
+    [PluginService] public static IAddonEventManager EventManager { get; set; } = null!;
+    [PluginService] public static IPluginLog Log { get; set; } = null!;
 }

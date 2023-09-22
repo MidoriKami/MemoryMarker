@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Dalamud.Configuration;
-using Dalamud.Plugin;
 using MemoryMarker.DataModels;
 
 namespace MemoryMarker;
@@ -13,8 +12,5 @@ public class Configuration : IPluginConfiguration
 
     public Dictionary<uint, ZoneMarkerData> FieldMarkerData = new();
 
-    [NonSerialized]
-    private DalamudPluginInterface? pluginInterface;
-    public void Initialize(DalamudPluginInterface dalamudInterface) => pluginInterface = dalamudInterface;
-    public void Save() => pluginInterface!.SavePluginConfig(this);
+    public void Save() => Service.PluginInterface.SavePluginConfig(this);
 }
