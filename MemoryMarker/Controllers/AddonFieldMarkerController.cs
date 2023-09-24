@@ -33,6 +33,7 @@ public unsafe class AddonFieldMarkerController : IDisposable
             var atkValueIndex = index * 2 + 34;
             ref var flagValue = ref addon->AtkUnitBase.AtkValues[atkValueIndex];
             ref var markerData = ref value.MarkerData[index];
+            ref var fieldMarker = ref FieldMarkerModule.Instance()->PresetArraySpan[index];
 
             // There is a valid entry in this slot
             if (flagValue is { Type: ValueType.UInt, Byte: not 0 })
@@ -48,6 +49,14 @@ public unsafe class AddonFieldMarkerController : IDisposable
                         Name = string.Empty
                     };
 
+                    configChanged = true;
+                }
+
+                // Preset has been modified
+                if (fieldMarker.Timestamp != markerData.Marker.Timestamp)
+                {
+                    markerData.Marker = fieldMarker;
+                    
                     configChanged = true;
                 }
             }
