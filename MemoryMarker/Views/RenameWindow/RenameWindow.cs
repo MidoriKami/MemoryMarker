@@ -65,8 +65,11 @@ public unsafe class RenameWindow : Window
 
     public override void OnClose()
     {
-        Service.PluginInterface.UiBuilder.AddNotification($"""Preset "{AgentFieldMarker->PresetLabelsSpan[SelectedSlot].ToString()[3..]}" saved.""", "Memory Marker", NotificationType.Success);
+        if (MemoryMarkerSystem.Configuration.FieldMarkerData[Service.ClientState.TerritoryType].MarkerData[SelectedSlot] is not { } setting) return;
+
         if (setting is { Name: "" }) setting.Name = SelectedSlotString;
+
+        Service.PluginInterface.UiBuilder.AddNotification($"""Preset "{setting.Name}" saved.""", "Memory Marker", NotificationType.Success);
 
         KamiCommon.WindowManager.RemoveWindow(this);
         _instance = null;
