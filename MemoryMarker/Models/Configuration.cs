@@ -12,7 +12,9 @@ public class NamedMarker
 
 public class ZoneMarkerData
 {
-    public NamedMarker?[] MarkerData { get; init; } = null!;
+    private const int WaymarkCount = 30;
+    
+    public NamedMarker?[] MarkerData { get; init; } = new NamedMarker?[WaymarkCount];
 
     public int Count => MarkerData.OfType<NamedMarker>().Count();
 }
