@@ -40,7 +40,7 @@ public unsafe class AddonFieldMarkerController : IDisposable
                 // Newly added
                 if (markerData is null)
                 {
-                    Service.Log.Verbose($"Adding preset, index: {index}");
+                    Service.Log.Debug($"[{index + 1,2}] Adding preset");
 
                     markerData = new NamedMarker
                     {
@@ -58,7 +58,7 @@ public unsafe class AddonFieldMarkerController : IDisposable
                 // Recently removed
                 if (markerData is not null)
                 {
-                    Service.Log.Verbose($"Removing preset, index: {index}");
+                    Service.Log.Debug($"[{index + 1,2}] Removing preset");
 
                     markerData = null;
                     configChanged = true;
