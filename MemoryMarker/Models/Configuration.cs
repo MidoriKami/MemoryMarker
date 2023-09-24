@@ -7,7 +7,7 @@ namespace MemoryMarker;
 public class NamedMarker
 {
     public string Name = string.Empty;
-    public FieldMarkerPreset Marker { get; init; }
+    public FieldMarkerPreset Marker { get; set; }
 }
 
 public class ZoneMarkerData
