@@ -37,8 +37,6 @@ public class MemoryMarkerSystem : IDisposable
         {
             if (Configuration.FieldMarkerData.TryAdd(territoryType, new ZoneMarkerData()))
             {
-                SetZoneMarkerData(markers);
-                Service.Log.Debug($"[Territory: {territoryType}] Loading Waymarks, Count: {markers.MarkerData.OfType<NamedMarker>().Count()}");
                 Service.Log.Debug($"No markers for {territoryType}, creating");
                 Configuration.Save();
             }
@@ -54,16 +52,17 @@ public class MemoryMarkerSystem : IDisposable
     {
         foreach (var index in Enumerable.Range(0, data.MarkerData.Length))
         {
-            var savedMarker = data.MarkerData[index]?.Marker;
+            var namedMarker = data.MarkerData[index];
             var targetAddress = FieldMarkerModule.Instance()->PresetArraySpan.Get(index);
 
-            if (savedMarker is null)
+            if (namedMarker is not null)
             {
-                Marshal.Copy(new byte[sizeof(FieldMarkerPreset)], 0, (nint) targetAddress, sizeof(FieldMarkerPreset));
+                Service.Log.Debug($"[Territory: {Service.ClientState.TerritoryType, 4}] [{index,2}] Loaded '{(namedMarker.Name.IsNullOrEmpty() ? "Unnamed" : namedMarker.Name)}'");
+                Marshal.StructureToPtr(namedMarker.Marker, (nint) targetAddress, false);
             }
             else
             {
-                Marshal.StructureToPtr(savedMarker, (nint) targetAddress, false);
+                Marshal.Copy(new byte[sizeof(FieldMarkerPreset)], 0, (nint) targetAddress, sizeof(FieldMarkerPreset));
             }
         }
     }
