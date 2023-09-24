@@ -18,6 +18,8 @@ public class MemoryMarkerSystem : IDisposable
         ContextMenu = new AddonFieldMarkerContextMenu();
         FieldMarkerController = new AddonFieldMarkerController();
         
+        if (Condition.IsBoundByDuty()) OnZoneChange(Service.ClientState.TerritoryType);
+        
         Service.ClientState.TerritoryChanged += OnZoneChange;
     }
 
