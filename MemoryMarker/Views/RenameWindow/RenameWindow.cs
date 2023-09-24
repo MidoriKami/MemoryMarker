@@ -54,7 +54,6 @@ public unsafe class RenameWindow : Window
         ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
         if (ImGui.InputText("###RenameTextInput", ref setting.Name, 35, ImGuiInputTextFlags.AutoSelectAll | ImGuiInputTextFlags.EnterReturnsTrue))
         {
-            MemoryMarkerSystem.Configuration.Save();
             IsOpen = false;
         }
 
@@ -62,7 +61,6 @@ public unsafe class RenameWindow : Window
         ImGui.SetCursorPosX(ImGui.GetContentRegionMax().X - buttonSize.X);
         if (ImGui.Button("Save & Close", buttonSize))
         {
-            MemoryMarkerSystem.Configuration.Save();
             IsOpen = false;
         }
     }
