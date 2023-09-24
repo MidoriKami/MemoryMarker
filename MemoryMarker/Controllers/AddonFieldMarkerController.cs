@@ -1,9 +1,9 @@
 using System;
 using System.Linq;
-using Dalamud.Game.Addon;
+using Dalamud.Game.Addon.Lifecycle;
+using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using FFXIVClientStructs.FFXIV.Client.UI;
-using MemoryMarker.DataModels;
-using MemoryMarker.Utilities;
+using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
 
 namespace MemoryMarker.Controllers;
@@ -21,7 +21,7 @@ public unsafe class AddonFieldMarkerController : IDisposable
         Service.AddonLifecycle.UnregisterListener(OnPreDraw, OnPostUpdate);
     }
 
-    private void OnPostUpdate(AddonEvent eventType, IAddonArgs args)
+    private void OnPostUpdate(AddonEvent eventType, AddonArgs args)
     {
         var addon = (AddonFieldMarker*) args.Addon;
         if (!MemoryMarkerSystem.Configuration.FieldMarkerData.TryGetValue(Service.ClientState.TerritoryType, out var value)) return;
@@ -40,11 +40,11 @@ public unsafe class AddonFieldMarkerController : IDisposable
                 // Newly added
                 if (markerData is null)
                 {
-                    Service.Log.Verbose($"Adding Node {index}");
+                    Service.Log.Verbose($"Adding preset, index: {index}");
 
                     markerData = new NamedMarker
                     {
-                        Marker = MemoryHelper.GetPresetForIndex(index),
+                        Marker = FieldMarkerModule.Instance()->PresetArraySpan[index],
                         Name = string.Empty
                     };
 
@@ -58,7 +58,7 @@ public unsafe class AddonFieldMarkerController : IDisposable
                 // Recently removed
                 if (markerData is not null)
                 {
-                    Service.Log.Verbose($"Removing Node {index}");
+                    Service.Log.Verbose($"Removing preset, index: {index}");
 
                     markerData = null;
                     configChanged = true;
@@ -72,7 +72,7 @@ public unsafe class AddonFieldMarkerController : IDisposable
         }
     }
 
-    private void OnPreDraw(AddonEvent eventType, IAddonArgs args)
+    private void OnPreDraw(AddonEvent eventType, AddonArgs args)
     {
         var addon = (AddonFieldMarker*) args.Addon;
         if (!MemoryMarkerSystem.Configuration.FieldMarkerData.TryGetValue(Service.ClientState.TerritoryType, out var value)) return;

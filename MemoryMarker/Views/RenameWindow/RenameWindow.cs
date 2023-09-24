@@ -1,12 +1,12 @@
 ﻿using System.Numerics;
-using System.Text;
-using Dalamud.Game.Text.SeStringHandling;
-using Dalamud.Interface;
 using Dalamud.Interface.Internal.Notifications;
+using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
+using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using ImGuiNET;
 using KamiLib;
+using KamiLib.Utilities;
 using MemoryMarker.Controllers;
 
 namespace MemoryMarker.Windows;
@@ -22,11 +22,8 @@ public unsafe class RenameWindow : Window
     {
         IsOpen = true;
 
-        SizeConstraints = new WindowSizeConstraints
-        {
-            MinimumSize = new Vector2(200, 125),
-            MaximumSize = new Vector2(200, 125)
-        };
+        Size = new Vector2(200.0f, 125.0f);
+        SizeCondition = ImGuiCond.Always;
 
         Flags |= ImGuiWindowFlags.NoResize;
         Flags |= ImGuiWindowFlags.NoCollapse;
@@ -45,23 +42,16 @@ public unsafe class RenameWindow : Window
     {
         if (MemoryMarkerSystem.Configuration.FieldMarkerData[Service.ClientState.TerritoryType].MarkerData[SelectedSlot] is not { } setting) return;
 
-        if (setting is { Name: not "" })
+        if (setting is { Name: "" })
         {
-            var name = AgentFieldMarker->PresetLabelsSpan[SelectedSlot].ToString();
-            var filteredString = name[(name.IndexOf(' ') + 1)..];
-            setting.Name = SeString.Parse(Encoding.UTF8.GetBytes(filteredString)).ToString();
+            setting.Name = MemoryHelper.ReadSeString(AgentFieldMarker->PresetLabelsSpan.Get(SelectedSlot)).ToString()[3..];
         }
 
         ImGuiHelpers.ScaledDummy(10.0f);
 
-        var region = ImGui.GetContentRegionAvail();
+        if (ImGui.IsWindowAppearing()) ImGui.SetKeyboardFocusHere();
 
-        if (ImGui.IsWindowAppearing())
-        {
-            ImGui.SetKeyboardFocusHere();
-        }
-
-        ImGui.SetNextItemWidth(region.X);
+        ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
         if (ImGui.InputText("###RenameTextInput", ref setting.Name, 35, ImGuiInputTextFlags.AutoSelectAll | ImGuiInputTextFlags.EnterReturnsTrue))
         {
             MemoryMarkerSystem.Configuration.Save();
