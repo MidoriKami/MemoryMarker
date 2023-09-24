@@ -35,7 +35,7 @@ public unsafe class AddonFieldMarkerController : IDisposable
             ref var markerData = ref value.MarkerData[index];
 
             // There is a valid entry in this slot
-            if (flagValue is { Type: ValueType.UInt, UInt: not 0 })
+            if (flagValue is { Type: ValueType.UInt, Byte: not 0 })
             {
                 // Newly added
                 if (markerData is null)
