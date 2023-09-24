@@ -17,6 +17,7 @@ public unsafe class RenameWindow : Window
 
     private AgentFieldMarker* AgentFieldMarker => (AgentFieldMarker*) AgentModule.Instance()->GetAgentByInternalId(AgentId.FieldMarker);
     private int SelectedSlot => AgentFieldMarker->PageIndexOffset;
+    private string SelectedSlotString => MemoryHelper.ReadSeString(AgentFieldMarker->PresetLabelsSpan.Get(SelectedSlot)).ToString()[3..];
     
     private RenameWindow() : base("Rename Waymark")
     {
@@ -42,10 +43,7 @@ public unsafe class RenameWindow : Window
     {
         if (MemoryMarkerSystem.Configuration.FieldMarkerData[Service.ClientState.TerritoryType].MarkerData[SelectedSlot] is not { } setting) return;
 
-        if (setting is { Name: "" })
-        {
-            setting.Name = MemoryHelper.ReadSeString(AgentFieldMarker->PresetLabelsSpan.Get(SelectedSlot)).ToString()[3..];
-        }
+        if (setting is { Name: "" }) setting.Name = SelectedSlotString;
 
         ImGuiHelpers.ScaledDummy(10.0f);
 
@@ -68,6 +66,7 @@ public unsafe class RenameWindow : Window
     public override void OnClose()
     {
         Service.PluginInterface.UiBuilder.AddNotification($"""Preset "{AgentFieldMarker->PresetLabelsSpan[SelectedSlot].ToString()[3..]}" saved.""", "Memory Marker", NotificationType.Success);
+        if (setting is { Name: "" }) setting.Name = SelectedSlotString;
 
         KamiCommon.WindowManager.RemoveWindow(this);
         _instance = null;
