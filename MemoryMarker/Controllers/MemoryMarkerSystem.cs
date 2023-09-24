@@ -29,16 +29,24 @@ public class MemoryMarkerSystem : IDisposable
 
         if (Service.PluginInterface.InstalledPlugins.Any(pluginInfo => pluginInfo is { InternalName: "WaymarkPresetPlugin", IsLoaded: true }))
         {
-            Service.Log.Information("WaymarkPreset plugin detected, skipping writing waymarks to memory.");
+            Service.Log.Information("WaymarkPreset plugin detected, skipping writing waymarks to memory");
         }
-        else
+        
+        // If we are bound by duty after changing zones, we need to either generate new markers data, or load existing.
+        else if (Condition.IsBoundByDuty())
         {
-            // If we have saved markers for this territory
-            if (Configuration.FieldMarkerData.TryGetValue(territoryType, out var markers))
+            if (Configuration.FieldMarkerData.TryAdd(territoryType, new ZoneMarkerData()))
             {
                 SetZoneMarkerData(markers);
                 Service.Log.Debug($"[Territory: {territoryType}] Loading Waymarks, Count: {markers.MarkerData.OfType<NamedMarker>().Count()}");
+                Service.Log.Debug($"No markers for {territoryType}, creating");
+                Configuration.Save();
             }
+
+            var markersForTerritory = Configuration.FieldMarkerData[territoryType];
+
+            Service.Log.Info($"[Territory: {territoryType, 4}] Loading Waymarks, Count: {markersForTerritory.Count}");
+            SetZoneMarkerData(markersForTerritory);
         }
     }
 
