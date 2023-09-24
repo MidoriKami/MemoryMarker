@@ -13,6 +13,8 @@ public class NamedMarker
 public class ZoneMarkerData
 {
     public NamedMarker?[] MarkerData { get; init; } = null!;
+
+    public int Count => MarkerData.OfType<NamedMarker>().Count();
 }
 
 public class Configuration : IPluginConfiguration
