@@ -3,8 +3,8 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
-using KamiLib.GameState;
-using KamiLib.Utilities;
+using FFXIVClientStructs.Interop;
+using KamiLib.Game;
 
 namespace MemoryMarker.Controllers;
 
@@ -55,7 +55,7 @@ public class MemoryMarkerSystem : IDisposable
         foreach (var index in Enumerable.Range(0, data.MarkerData.Length))
         {
             var namedMarker = data.MarkerData[index];
-            var targetAddress = FieldMarkerModule.Instance()->PresetArraySpan.Get(index);
+            var targetAddress = FieldMarkerModule.Instance()->PresetArraySpan.GetPointer(index);
 
             if (namedMarker is not null)
             {

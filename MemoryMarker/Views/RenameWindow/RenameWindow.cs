@@ -4,9 +4,9 @@ using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
 using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+using FFXIVClientStructs.Interop;
 using ImGuiNET;
 using KamiLib;
-using KamiLib.Utilities;
 using MemoryMarker.Controllers;
 
 namespace MemoryMarker.Windows;
@@ -17,7 +17,7 @@ public unsafe class RenameWindow : Window
 
     private AgentFieldMarker* AgentFieldMarker => (AgentFieldMarker*) AgentModule.Instance()->GetAgentByInternalId(AgentId.FieldMarker);
     private int SelectedSlot => AgentFieldMarker->PageIndexOffset;
-    private string SelectedSlotString => MemoryHelper.ReadSeString(AgentFieldMarker->PresetLabelsSpan.Get(SelectedSlot)).ToString()[3..];
+    private string SelectedSlotString => MemoryHelper.ReadSeString(AgentFieldMarker->PresetLabelsSpan.GetPointer(SelectedSlot)).ToString()[3..];
     
     private RenameWindow() : base("Rename Waymark")
     {
