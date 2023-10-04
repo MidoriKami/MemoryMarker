@@ -40,7 +40,7 @@ public class MemoryMarkerSystem : IDisposable
             if (Configuration.FieldMarkerData.TryAdd(territoryType, new ZoneMarkerData()))
             {
                 Service.Log.Debug($"No markers for {territoryType}, creating");
-                Configuration.Save();
+                Configuration.Save(false);
             }
 
             var markersForTerritory = Configuration.FieldMarkerData[territoryType];

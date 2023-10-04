@@ -26,9 +26,9 @@ public class Configuration : IPluginConfiguration
 
     public Dictionary<uint, ZoneMarkerData> FieldMarkerData = new();
 
-    public void Save()
+    public void Save(bool prune = true)
     {
-        Prune();
+        if (prune) Prune();
         
         Service.PluginInterface.SavePluginConfig(this);
         
