@@ -6,15 +6,13 @@ namespace MemoryMarker;
 
 public sealed class MemoryMarkerPlugin : IDalamudPlugin
 {
-    public string Name => "MemoryMarker";
-    
     public static MemoryMarkerSystem System = null!;
 
     public MemoryMarkerPlugin(DalamudPluginInterface pluginInterface)
     {
         pluginInterface.Create<Service>();
 
-        KamiCommon.Initialize(pluginInterface, Name);
+        KamiCommon.Initialize(pluginInterface, "MemoryMarker");
 
         System = new MemoryMarkerSystem();
     }
