@@ -1,48 +1,35 @@
-﻿using Dalamud.ContextMenu;
-using Dalamud.Game.Text.SeStringHandling;
+﻿using Dalamud.Game.Gui.ContextMenu;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using MemoryMarker.Windows;
 
 namespace MemoryMarker.Controllers;
 
-public unsafe class AddonFieldMarkerContextMenu
-{
-    private static readonly SeString ContextMenuLabel = new SeStringBuilder().AddText("Rename").Build();
-    private readonly DalamudContextMenu contextMenu;
-    private readonly GameObjectContextMenuItem contextMenuItem;
-
-    public AddonFieldMarkerContextMenu()
-    {
-        contextMenu = new DalamudContextMenu(Service.PluginInterface);
-        contextMenuItem = new GameObjectContextMenuItem(ContextMenuLabel, RenameContextMenuAction, true);
-        contextMenu.OnOpenGameObjectContextMenu += OpenGameObjectContextMenu;
+public unsafe class AddonFieldMarkerContextMenu {
+    public AddonFieldMarkerContextMenu() {
+        Service.ContextMenu.OnMenuOpened += OnContextMenuOpened;
     }
 
-    public void Dispose()
-    {
-        contextMenu.OnOpenGameObjectContextMenu -= OpenGameObjectContextMenu;
-        contextMenu.Dispose();
+    public void Dispose() {
+        Service.ContextMenu.OnMenuOpened -= OnContextMenuOpened;
     }
 
-    private void OpenGameObjectContextMenu(GameObjectContextMenuOpenArgs args)
-    {
-        if (args is { ParentAddonName: "FieldMarker" })
-        {
-            args.AddCustomItem(contextMenuItem);
+    private void OnContextMenuOpened(MenuOpenedArgs args) {
+        if (args is { AddonName: "FieldMarker" }) {
+            args.AddMenuItem(new MenuItem{
+                Name = "Rename",
+                OnClicked = RenameContextMenuAction,
+            });
         }
     }
 
-    private void RenameContextMenuAction(GameObjectContextMenuItemSelectedArgs args)
-    {
+    private void RenameContextMenuAction(MenuItemClickedArgs menuItemClickedArgs) {
         // Check that we have saved config for this territory
-        if (MemoryMarkerSystem.Configuration.FieldMarkerData.TryGetValue(Service.ClientState.TerritoryType, out var value))
-        {
-            var agentFieldMarker = (AgentFieldMarker*) AgentModule.Instance()->GetAgentByInternalId(AgentId.FieldMarker);
+        if (MemoryMarkerSystem.Configuration.FieldMarkerData.TryGetValue(Service.ClientState.TerritoryType, out var value)) {
+            var agentFieldMarker = (AgentFieldMarker*) menuItemClickedArgs.AgentPtr;
             var slotClicked = agentFieldMarker->PageIndexOffset;
 
             // Check that the preset we are modifying exists
-            if (value.MarkerData[slotClicked] is not null)
-            {
+            if (value.MarkerData[slotClicked] is not null) {
                 RenameWindow.ShowWindow();
             }
         }

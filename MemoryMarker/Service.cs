@@ -10,4 +10,6 @@ internal class Service
     [PluginService] public static IClientState ClientState { get; set; } = null!;
     [PluginService] public static IAddonLifecycle AddonLifecycle { get; set; } = null!;
     [PluginService] public static IPluginLog Log { get; set; } = null!;
+    [PluginService] public static IContextMenu ContextMenu { get; set; } = null!;
+    [PluginService] public static INotificationManager NotificationManager { get; set; } = null!;
 }

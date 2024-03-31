@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Dalamud.Interface.ImGuiNotification;
 using Dalamud.Interface.Internal.Notifications;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
@@ -69,7 +70,11 @@ public unsafe class RenameWindow : Window
 
         if (setting is { Name: "" }) setting.Name = SelectedSlotString;
 
-        Service.PluginInterface.UiBuilder.AddNotification($"""Preset "{setting.Name}" saved.""", "Memory Marker", NotificationType.Success);
+        Service.NotificationManager.AddNotification(new Notification {
+            Type = NotificationType.Success,
+            Content = $"""Preset "{setting.Name}" saved.""",
+            Title = "Memory Marker"
+        });
 
         KamiCommon.WindowManager.RemoveWindow(this);
         _instance = null;
