@@ -97,11 +97,11 @@ public class MemoryMarkerSystem : IDisposable
             if (namedMarker is not null)
             {
                 Service.Log.Debug($"[Territory: {Service.ClientState.TerritoryType, 4}] [{index,2}] Loaded '{(namedMarker.Name.IsNullOrEmpty() ? "Unnamed" : namedMarker.Name)}'");
-                Marshal.StructureToPtr(namedMarker.Marker, (nint) targetAddress, false);
+                *targetAddress = namedMarker.Marker;
             }
             else
             {
-                Marshal.Copy(new byte[sizeof(FieldMarkerPreset)], 0, (nint) targetAddress, sizeof(FieldMarkerPreset));
+                *targetAddress = default;
             }
         }
     }
