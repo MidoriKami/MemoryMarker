@@ -1,11 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Dalamud.NET.Sdk/9.0.1">
     <PropertyGroup>
         <AssemblyVersion>1.1.0.2</AssemblyVersion>
         <PackageProjectUrl>https://github.com/MidoriKami/MemoryMarker</PackageProjectUrl>
     </PropertyGroup>
-
-    <Import Project="Dalamud.Plugin.Bootstrap.targets"/>
 
     <ItemGroup>
         <None Remove="MemoryMarker.json"/>
