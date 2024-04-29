@@ -1,5 +1,4 @@
 ﻿using Dalamud.Plugin;
-using MemoryMarker.Controllers;
 
 namespace MemoryMarker;
 

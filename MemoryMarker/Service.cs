@@ -14,5 +14,4 @@ internal class Service {
     [PluginService] public static INotificationManager NotificationManager { get; set; }
     [PluginService] public static ICondition Condition { get; set; }
     [PluginService] public static IDataManager DataManager { get; set; }
-    [PluginService] public static IChatGui ChatGui { get; set; }
 }

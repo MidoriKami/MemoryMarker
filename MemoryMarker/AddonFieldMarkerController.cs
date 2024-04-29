@@ -6,7 +6,7 @@ using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
 
-namespace MemoryMarker.Controllers;
+namespace MemoryMarker;
 
 public unsafe class AddonFieldMarkerController : IDisposable {
     public AddonFieldMarkerController() {
@@ -34,7 +34,7 @@ public unsafe class AddonFieldMarkerController : IDisposable {
             if (flagValue is { Type: ValueType.UInt, Byte: not 0 }) {
                 // Newly added
                 if (markerData is null) {
-                    Service.Log.Debug($"[{ index + 1, 2 }] Adding preset");
+                    Service.Log.Debug($"[{index + 1,2}] Adding preset");
 
                     markerData = new NamedMarker {
                         Marker = FieldMarkerModule.Instance()->PresetArraySpan[index],
@@ -47,7 +47,7 @@ public unsafe class AddonFieldMarkerController : IDisposable {
                 // Preset has been modified
                 if (fieldMarker.Timestamp != markerData.Marker.Timestamp) {
                     markerData.Marker = fieldMarker;
-                    
+
                     configChanged = true;
                 }
             }
@@ -56,7 +56,7 @@ public unsafe class AddonFieldMarkerController : IDisposable {
             else {
                 // Recently removed
                 if (markerData is not null) {
-                    Service.Log.Debug($"[{ index + 1, 2 }] Removing preset");
+                    Service.Log.Debug($"[{index + 1,2}] Removing preset");
 
                     markerData = null;
                     configChanged = true;
@@ -82,7 +82,7 @@ public unsafe class AddonFieldMarkerController : IDisposable {
             var buttonNode = addon->AtkUnitBase.GetButtonNodeById(nodeId);
             if (buttonNode is null) continue;
 
-            var desiredLabel = $"{ entryIndex + 1 }. { name }";
+            var desiredLabel = $"{entryIndex + 1}. {name}";
 
             if (buttonNode->ButtonTextNode->NodeText.ToString() != desiredLabel) {
                 buttonNode->ButtonTextNode->NodeText.SetString(desiredLabel);

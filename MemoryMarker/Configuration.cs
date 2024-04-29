@@ -21,9 +21,9 @@ public class Configuration : CharacterConfiguration {
 
     public void Save(bool prune = true) {
         if (prune) FieldMarkerData = FieldMarkerData.Where(dataPair => dataPair.Value.Count is not 0).ToDictionary();
-        
+
         Service.PluginInterface.SavePluginConfig(this);
-        
+
         Service.Log.Verbose($"Saving {FieldMarkerData.Count} Territories");
         foreach (var (territory, zoneMarkerData) in FieldMarkerData) {
             Service.Log.Verbose($"[{territory,4}] Saving {zoneMarkerData.Count} Markers");
