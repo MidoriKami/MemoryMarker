@@ -60,8 +60,7 @@ public unsafe class RenameWindow : Window {
 
         Service.NotificationManager.AddNotification(new Notification {
             Type = NotificationType.Success,
-            Content = $"""Preset "{setting.Name}" saved.""",
-            Title = "Memory Marker"
+            Content = $"""Preset "{setting.Name}" saved"""
         });
 
         MemoryMarkerSystem.WindowManager.RemoveWindow(this);
