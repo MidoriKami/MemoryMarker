@@ -10,8 +10,8 @@ namespace MemoryMarker;
 
 public unsafe class AddonFieldMarkerController : IDisposable {
     public AddonFieldMarkerController() {
-        Service.AddonLifecycle.RegisterListener(AddonEvent.PreDraw, "FieldMarker", OnPreDraw);
         Service.AddonLifecycle.RegisterListener(AddonEvent.PostUpdate, "FieldMarker", OnPostUpdate);
+        Service.AddonLifecycle.RegisterListener(AddonEvent.PreDraw, "FieldMarker", OnPreDraw);
     }
 
     public void Dispose() {

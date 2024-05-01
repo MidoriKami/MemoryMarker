@@ -12,6 +12,10 @@ namespace MemoryMarker;
 
 public unsafe class RenameWindow : Window {
     private static RenameWindow? _instance;
+    
+    private AgentFieldMarker* AgentFieldMarker => (AgentFieldMarker*) AgentModule.Instance()->GetAgentByInternalId(AgentId.FieldMarker);
+    private int SelectedSlot => AgentFieldMarker->PageIndexOffset;
+    private string SelectedSlotString => MemoryHelper.ReadSeString(AgentFieldMarker->PresetLabelsSpan.GetPointer(SelectedSlot)).ToString()[3..];
 
     private RenameWindow() : base("Rename Waymark", new Vector2(200.0f, 125.0f), true) {
         IsOpen = true;
@@ -21,10 +25,6 @@ public unsafe class RenameWindow : Window {
         Flags |= ImGuiWindowFlags.NoResize;
         Flags |= ImGuiWindowFlags.NoCollapse;
     }
-
-    private AgentFieldMarker* AgentFieldMarker => (AgentFieldMarker*) AgentModule.Instance()->GetAgentByInternalId(AgentId.FieldMarker);
-    private int SelectedSlot => AgentFieldMarker->PageIndexOffset;
-    private string SelectedSlotString => MemoryHelper.ReadSeString(AgentFieldMarker->PresetLabelsSpan.GetPointer(SelectedSlot)).ToString()[3..];
 
     public static void ShowWindow() {
         if (_instance is null) {

@@ -10,7 +10,11 @@ using Lumina.Excel.GeneratedSheets;
 namespace MemoryMarker;
 
 public class MemoryMarkerSystem : IDisposable {
-
+    public static Configuration Configuration { get; private set; } = null!;
+    public static AddonFieldMarkerContextMenu ContextMenu { get; private set; } = null!;
+    public static AddonFieldMarkerController FieldMarkerController { get; private set; } = null!;
+    public static WindowManager WindowManager { get; set; } = null!;
+    
     public MemoryMarkerSystem() {
         Configuration = Service.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
         ContextMenu = new AddonFieldMarkerContextMenu();
@@ -21,10 +25,6 @@ public class MemoryMarkerSystem : IDisposable {
 
         Service.ClientState.TerritoryChanged += OnZoneChange;
     }
-    public static Configuration Configuration { get; private set; } = null!;
-    public static AddonFieldMarkerContextMenu ContextMenu { get; private set; } = null!;
-    public static AddonFieldMarkerController FieldMarkerController { get; private set; } = null!;
-    public static WindowManager WindowManager { get; set; } = null!;
 
     public void Dispose() {
         Service.ClientState.TerritoryChanged -= OnZoneChange;
