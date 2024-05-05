@@ -31,5 +31,4 @@ public class Configuration : IPluginConfiguration {
             Service.Log.Verbose($"[{territory,4}] Saving {zoneMarkerData.Count} Markers");
         }
     }
-
 }
