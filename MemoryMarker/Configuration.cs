@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Dalamud.Configuration;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
-using KamiLib.Configuration;
 
 namespace MemoryMarker;
 
@@ -16,7 +16,9 @@ public class ZoneMarkerData {
     public int Count => MarkerData.OfType<NamedMarker>().Count();
 }
 
-public class Configuration : CharacterConfiguration {
+public class Configuration : IPluginConfiguration {
+    public int Version { get; set; } = 2;
+    
     public Dictionary<uint, ZoneMarkerData> FieldMarkerData = new();
 
     public void Save(bool prune = true) {
@@ -29,4 +31,5 @@ public class Configuration : CharacterConfiguration {
             Service.Log.Verbose($"[{territory,4}] Saving {zoneMarkerData.Count} Markers");
         }
     }
+
 }
