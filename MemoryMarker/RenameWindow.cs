@@ -11,31 +11,23 @@ using KamiLib.Window;
 namespace MemoryMarker;
 
 public unsafe class RenameWindow : Window {
-    private static RenameWindow? _instance;
-    
     private AgentFieldMarker* AgentFieldMarker => (AgentFieldMarker*) AgentModule.Instance()->GetAgentByInternalId(AgentId.FieldMarker);
+    
     private int SelectedSlot => AgentFieldMarker->PageIndexOffset;
+    
     private string SelectedSlotString => MemoryHelper.ReadSeString(AgentFieldMarker->PresetLabelsSpan.GetPointer(SelectedSlot)).ToString()[3..];
 
-    private RenameWindow() : base("Rename Waymark", new Vector2(200.0f, 125.0f), true) {
-        IsOpen = true;
-
-        AdditionalInfoTooltip = "Renames Waymark Presets";
-
+    public RenameWindow() : base("Rename Waymark", new Vector2(200.0f, 125.0f), true) {
         Flags |= ImGuiWindowFlags.NoResize;
         Flags |= ImGuiWindowFlags.NoCollapse;
     }
 
-    public static void ShowWindow() {
-        if (_instance is null) {
-            MemoryMarkerSystem.WindowManager.AddWindow(_instance = new RenameWindow());
-        }
-    }
-
-    public override void Draw() {
+    protected override void DrawContents() {
         if (MemoryMarkerSystem.Configuration.FieldMarkerData[Service.ClientState.TerritoryType].MarkerData[SelectedSlot] is not { } setting) return;
 
-        if (setting is { Name: "" }) setting.Name = SelectedSlotString;
+        if (setting is { Name: "" }) {
+            setting.Name = SelectedSlotString;
+        }
 
         ImGuiHelpers.ScaledDummy(10.0f);
 
@@ -43,13 +35,13 @@ public unsafe class RenameWindow : Window {
 
         ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
         if (ImGui.InputText("###RenameTextInput", ref setting.Name, 35, ImGuiInputTextFlags.AutoSelectAll | ImGuiInputTextFlags.EnterReturnsTrue)) {
-            IsOpen = false;
+            Close();
         }
 
         var buttonSize = ImGuiHelpers.ScaledVector2(100.0f, 23.0f);
         ImGui.SetCursorPosX(ImGui.GetContentRegionMax().X - buttonSize.X);
         if (ImGui.Button("Save & Close", buttonSize)) {
-            IsOpen = false;
+            Close();
         }
     }
 
@@ -64,7 +56,6 @@ public unsafe class RenameWindow : Window {
         });
 
         MemoryMarkerSystem.WindowManager.RemoveWindow(this);
-        _instance = null;
         MemoryMarkerSystem.Configuration.Save();
     }
 }

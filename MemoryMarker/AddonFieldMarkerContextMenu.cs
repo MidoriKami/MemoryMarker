@@ -2,6 +2,7 @@
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
+using KamiLib.Window;
 
 namespace MemoryMarker;
 
@@ -26,8 +27,7 @@ public unsafe class AddonFieldMarkerContextMenu {
             args.AddMenuItem(new MenuItem {
                 Name = "Rename",
                 OnClicked = RenameContextMenuAction,
-                Prefix = MenuItem.DalamudDefaultPrefix,
-                PrefixColor = MenuItem.DalamudDefaultPrefixColor,
+                UseDefaultPrefix = true,
                 IsEnabled =
                     GameMain.Instance()->CurrentContentFinderConditionId == slotMarkerData.ContentFinderConditionId &&
                     GameMain.Instance()->CurrentContentFinderConditionId is not 0 &&
@@ -44,7 +44,7 @@ public unsafe class AddonFieldMarkerContextMenu {
         if (MemoryMarkerSystem.Configuration.FieldMarkerData.TryGetValue(Service.ClientState.TerritoryType, out var value)) {
             // Check that the preset we are modifying exists
             if (value.MarkerData[slotClicked] is not null) {
-                RenameWindow.ShowWindow();
+                MemoryMarkerSystem.WindowManager.AddWindow(new RenameWindow(), WindowFlags.OpenImmediately);
             }
         }
     }
