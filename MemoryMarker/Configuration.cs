@@ -19,7 +19,7 @@ public class ZoneMarkerData {
 public class Configuration : IPluginConfiguration {
     public int Version { get; set; } = 2;
     
-    public Dictionary<uint, ZoneMarkerData> FieldMarkerData = new();
+    public Dictionary<uint, ZoneMarkerData> FieldMarkerData = [];
 
     public void Save(bool prune = true) {
         if (prune) FieldMarkerData = FieldMarkerData.Where(dataPair => dataPair.Value.Count is not 0).ToDictionary();

@@ -83,7 +83,9 @@ public class MemoryMarkerSystem : IDisposable {
             }
         }
 
-        if (markersChanged) Configuration.Save();
+        if (markersChanged) {
+            Configuration.Save();
+        }
     }
 
     private static unsafe void SetZoneMarkerData(ZoneMarkerData data) {
