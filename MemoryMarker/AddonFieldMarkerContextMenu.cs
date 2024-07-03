@@ -15,14 +15,14 @@ public unsafe class AddonFieldMarkerContextMenu {
         Service.ContextMenu.OnMenuOpened -= OnContextMenuOpened;
     }
 
-    private void OnContextMenuOpened(MenuOpenedArgs args) {
+    private void OnContextMenuOpened(IMenuOpenedArgs args) {
         if (args is { AddonName: "FieldMarker" }) {
 
             // Just don't even add the Rename button if the player is in PvP
             if (Service.ClientState.IsPvP) return;
 
             var slotClicked = AgentFieldMarker.Instance()->PageIndexOffset;
-            ref var slotMarkerData = ref FieldMarkerModule.Instance()->PresetArraySpan[slotClicked];
+            ref var slotMarkerData = ref FieldMarkerModule.Instance()->Presets[slotClicked];
 
             args.AddMenuItem(new MenuItem {
                 Name = "Rename",
@@ -31,20 +31,20 @@ public unsafe class AddonFieldMarkerContextMenu {
                 IsEnabled =
                     GameMain.Instance()->CurrentContentFinderConditionId == slotMarkerData.ContentFinderConditionId &&
                     GameMain.Instance()->CurrentContentFinderConditionId is not 0 &&
-                    slotMarkerData.ContentFinderConditionId is not 0
+                    slotMarkerData.ContentFinderConditionId is not 0,
             });
         }
     }
 
-    private void RenameContextMenuAction(MenuItemClickedArgs menuItemClickedArgs) {
+    private void RenameContextMenuAction(IMenuItemClickedArgs menuItemClickedArgs) {
         var agentFieldMarker = (AgentFieldMarker*) menuItemClickedArgs.AgentPtr;
         var slotClicked = agentFieldMarker->PageIndexOffset;
 
         // Check that we have saved config for this territory
-        if (MemoryMarkerSystem.Configuration.FieldMarkerData.TryGetValue(Service.ClientState.TerritoryType, out var value)) {
+        if (System.Configuration.FieldMarkerData.TryGetValue(Service.ClientState.TerritoryType, out var value)) {
             // Check that the preset we are modifying exists
             if (value.MarkerData[slotClicked] is not null) {
-                MemoryMarkerSystem.WindowManager.AddWindow(new RenameWindow(), WindowFlags.OpenImmediately);
+                System.WindowManager.AddWindow(new RenameWindow(), WindowFlags.OpenImmediately);
             }
         }
     }

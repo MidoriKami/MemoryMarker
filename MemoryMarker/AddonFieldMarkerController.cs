@@ -20,7 +20,7 @@ public unsafe class AddonFieldMarkerController : IDisposable {
 
     private void OnPostUpdate(AddonEvent eventType, AddonArgs args) {
         var addon = (AddonFieldMarker*) args.Addon;
-        if (!MemoryMarkerSystem.Configuration.FieldMarkerData.TryGetValue(Service.ClientState.TerritoryType, out var value)) return;
+        if (!System.Configuration.FieldMarkerData.TryGetValue(Service.ClientState.TerritoryType, out var value)) return;
 
         var configChanged = false;
 
@@ -28,7 +28,7 @@ public unsafe class AddonFieldMarkerController : IDisposable {
             var atkValueIndex = index * 2 + 34;
             ref var flagValue = ref addon->AtkUnitBase.AtkValues[atkValueIndex];
             ref var markerData = ref value.MarkerData[index];
-            ref var fieldMarker = ref FieldMarkerModule.Instance()->PresetArraySpan[index];
+            ref var fieldMarker = ref FieldMarkerModule.Instance()->Presets[index];
 
             // There is a valid entry in this slot
             if (flagValue is { Type: ValueType.UInt, Byte: not 0 }) {
@@ -37,7 +37,7 @@ public unsafe class AddonFieldMarkerController : IDisposable {
                     Service.Log.Debug($"[{index + 1,2}] Adding preset");
 
                     markerData = new NamedMarker {
-                        Marker = FieldMarkerModule.Instance()->PresetArraySpan[index],
+                        Marker = FieldMarkerModule.Instance()->Presets[index],
                         Name = string.Empty
                     };
 
@@ -65,13 +65,13 @@ public unsafe class AddonFieldMarkerController : IDisposable {
         }
 
         if (configChanged) {
-            MemoryMarkerSystem.Configuration.Save();
+            System.Configuration.Save();
         }
     }
 
     private void OnPreDraw(AddonEvent eventType, AddonArgs args) {
         var addon = (AddonFieldMarker*) args.Addon;
-        if (!MemoryMarkerSystem.Configuration.FieldMarkerData.TryGetValue(Service.ClientState.TerritoryType, out var value)) return;
+        if (!System.Configuration.FieldMarkerData.TryGetValue(Service.ClientState.TerritoryType, out var value)) return;
 
         foreach (var index in Enumerable.Range(0, 5)) {
             var entryIndex = index + addon->SelectedPage * 5;

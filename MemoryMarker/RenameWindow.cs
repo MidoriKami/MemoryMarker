@@ -1,6 +1,5 @@
 ﻿using System.Numerics;
 using Dalamud.Interface.ImGuiNotification;
-using Dalamud.Interface.Internal.Notifications;
 using Dalamud.Interface.Utility;
 using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
@@ -15,7 +14,7 @@ public unsafe class RenameWindow : Window {
     
     private int SelectedSlot => AgentFieldMarker->PageIndexOffset;
     
-    private string SelectedSlotString => MemoryHelper.ReadSeString(AgentFieldMarker->PresetLabelsSpan.GetPointer(SelectedSlot)).ToString()[3..];
+    private string SelectedSlotString => MemoryHelper.ReadSeString(AgentFieldMarker->PresetLabels.GetPointer(SelectedSlot)).ToString()[3..];
 
     public RenameWindow() : base("Rename Waymark", new Vector2(200.0f, 125.0f), true) {
         Flags |= ImGuiWindowFlags.NoResize;
@@ -23,7 +22,7 @@ public unsafe class RenameWindow : Window {
     }
 
     protected override void DrawContents() {
-        if (MemoryMarkerSystem.Configuration.FieldMarkerData[Service.ClientState.TerritoryType].MarkerData[SelectedSlot] is not { } setting) return;
+        if (System.Configuration.FieldMarkerData[Service.ClientState.TerritoryType].MarkerData[SelectedSlot] is not { } setting) return;
 
         if (setting is { Name: "" }) {
             setting.Name = SelectedSlotString;
@@ -46,16 +45,16 @@ public unsafe class RenameWindow : Window {
     }
 
     public override void OnClose() {
-        if (MemoryMarkerSystem.Configuration.FieldMarkerData[Service.ClientState.TerritoryType].MarkerData[SelectedSlot] is not { } setting) return;
+        if (System.Configuration.FieldMarkerData[Service.ClientState.TerritoryType].MarkerData[SelectedSlot] is not { } setting) return;
 
         if (setting is { Name: "" }) setting.Name = SelectedSlotString;
 
         Service.NotificationManager.AddNotification(new Notification {
             Type = NotificationType.Success,
-            Content = $"""Preset "{setting.Name}" saved"""
+            Content = $"""Preset "{setting.Name}" saved""",
         });
 
-        MemoryMarkerSystem.WindowManager.RemoveWindow(this);
-        MemoryMarkerSystem.Configuration.Save();
+        System.WindowManager.RemoveWindow(this);
+        System.Configuration.Save();
     }
 }
