@@ -7,6 +7,8 @@ using KamiLib.Window;
 namespace MemoryMarker;
 
 public unsafe class AddonFieldMarkerContextMenu {
+    private int slotClicked = -1;
+    
     public AddonFieldMarkerContextMenu() {
         Service.ContextMenu.OnMenuOpened += OnContextMenuOpened;
     }
@@ -21,7 +23,7 @@ public unsafe class AddonFieldMarkerContextMenu {
             // Just don't even add the Rename button if the player is in PvP
             if (Service.ClientState.IsPvP) return;
 
-            var slotClicked = AgentFieldMarker.Instance()->PageIndexOffset;
+            slotClicked = AgentFieldMarker.Instance()->PageIndexOffset;
             ref var slotMarkerData = ref FieldMarkerModule.Instance()->Presets[slotClicked];
 
             args.AddMenuItem(new MenuItem {
@@ -37,8 +39,7 @@ public unsafe class AddonFieldMarkerContextMenu {
     }
 
     private void RenameContextMenuAction(IMenuItemClickedArgs menuItemClickedArgs) {
-        var agentFieldMarker = (AgentFieldMarker*) menuItemClickedArgs.AgentPtr;
-        var slotClicked = agentFieldMarker->PageIndexOffset;
+        if (slotClicked is -1) return;
 
         // Check that we have saved config for this territory
         if (System.Configuration.FieldMarkerData.TryGetValue(Service.ClientState.TerritoryType, out var value)) {
