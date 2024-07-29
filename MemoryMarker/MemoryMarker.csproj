@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Dalamud.NET.Sdk/9.0.2">
     <PropertyGroup>
-        <AssemblyVersion>2.0.0.1</AssemblyVersion>
+        <AssemblyVersion>2.1.0.0</AssemblyVersion>
         <PackageProjectUrl>https://github.com/MidoriKami/MemoryMarker</PackageProjectUrl>
     </PropertyGroup>
 
