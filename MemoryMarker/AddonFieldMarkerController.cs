@@ -4,6 +4,7 @@ using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
+using FFXIVClientStructs.Interop;
 using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
 
 namespace MemoryMarker;
@@ -28,7 +29,7 @@ public unsafe class AddonFieldMarkerController : IDisposable {
             var atkValueIndex = index * 2 + 34;
             ref var flagValue = ref addon->AtkUnitBase.AtkValues[atkValueIndex];
             ref var markerData = ref value.MarkerData[index];
-            ref var fieldMarker = ref FieldMarkerModule.Instance()->Presets[index];
+            var fieldMarker = (FieldMarkerPreset*) FieldMarkerModule.Instance()->Presets.GetPointer(index);
 
             // There is a valid entry in this slot
             if (flagValue is { Type: ValueType.UInt, Byte: not 0 }) {
@@ -37,7 +38,7 @@ public unsafe class AddonFieldMarkerController : IDisposable {
                     Service.Log.Debug($"[{index + 1,2}] Adding preset");
 
                     markerData = new NamedMarker {
-                        Marker = FieldMarkerModule.Instance()->Presets[index],
+                        Marker = *(FieldMarkerPreset*) FieldMarkerModule.Instance()->Presets.GetPointer(index),
                         Name = string.Empty
                     };
 
@@ -45,8 +46,8 @@ public unsafe class AddonFieldMarkerController : IDisposable {
                 }
 
                 // Preset has been modified
-                if (fieldMarker.Timestamp != markerData.Marker.Timestamp) {
-                    markerData.Marker = fieldMarker;
+                if (fieldMarker->Timestamp != markerData.Marker.Timestamp) {
+                    markerData.Marker = *fieldMarker;
 
                     configChanged = true;
                 }

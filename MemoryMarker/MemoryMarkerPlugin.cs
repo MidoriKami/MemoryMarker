@@ -15,6 +15,8 @@ public sealed class MemoryMarkerPlugin : IDalamudPlugin {
 		pluginInterface.Create<Service>();
 
 		System.Configuration = Service.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+		EnsureSafeConfigVersion();
+
 		System.ContextMenu = new AddonFieldMarkerContextMenu();
 		System.FieldMarkerController = new AddonFieldMarkerController();
 		System.WindowManager = new WindowManager(Service.PluginInterface);
@@ -73,7 +75,7 @@ public sealed class MemoryMarkerPlugin : IDalamudPlugin {
 			if (System.Configuration.FieldMarkerData[territoryType].MarkerData[index] is null) {
 				Service.Log.Debug($"[Territory: {territoryType,4}] New Waymark Found, Index {index}");
 				System.Configuration.FieldMarkerData[territoryType].MarkerData[index] = new NamedMarker {
-					Marker = *marker,
+					Marker = *(FieldMarkerPreset*) marker,
 					Name = string.Empty
 				};
 
@@ -89,7 +91,7 @@ public sealed class MemoryMarkerPlugin : IDalamudPlugin {
 	private static unsafe void SetZoneMarkerData(ZoneMarkerData data) {
 		foreach (var index in Enumerable.Range(0, data.MarkerData.Length)) {
 			var namedMarker = data.MarkerData[index];
-			var targetAddress = FieldMarkerModule.Instance()->Presets.GetPointer(index);
+			var targetAddress = (FieldMarkerPreset*) FieldMarkerModule.Instance()->Presets.GetPointer(index);
 
 			if (namedMarker is not null) {
 				Service.Log.Debug($"[Territory: {Service.ClientState.TerritoryType,4}] [{index,2}] Loaded '{(namedMarker.Name.IsNullOrEmpty() ? "Unnamed" : namedMarker.Name)}'");
@@ -98,6 +100,15 @@ public sealed class MemoryMarkerPlugin : IDalamudPlugin {
 			else {
 				*targetAddress = default;
 			}
+		}
+	}
+	
+	
+	private static void EnsureSafeConfigVersion() {
+		// If version is outdated, wipe and reset, it contains invalid data.
+		if (System.Configuration.Version <= 2) {
+			System.Configuration = new Configuration();
+			System.Configuration.Save();
 		}
 	}
 }

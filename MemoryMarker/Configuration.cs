@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Dalamud.Configuration;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 
@@ -17,7 +18,7 @@ public class ZoneMarkerData {
 }
 
 public class Configuration : IPluginConfiguration {
-    public int Version { get; set; } = 2;
+    public int Version { get; set; } = 3;
     
     public Dictionary<uint, ZoneMarkerData> FieldMarkerData = [];
 
@@ -31,4 +32,20 @@ public class Configuration : IPluginConfiguration {
             Service.Log.Verbose($"[{territory,4}] Saving {zoneMarkerData.Count} Markers");
         }
     }
+}
+
+[StructLayout(LayoutKind.Sequential, Pack = 0, Size = 0x68)]
+public struct FieldMarkerPreset {
+    public GamePresetPoint A;
+    public GamePresetPoint B;
+    public GamePresetPoint C;
+    public GamePresetPoint D;
+    public GamePresetPoint One;
+    public GamePresetPoint Two;
+    public GamePresetPoint Three;
+    public GamePresetPoint Four;
+    public byte ActiveMarkers;
+    public byte Reserved;
+    public ushort ContentFinderConditionId;
+    public int Timestamp;
 }
