@@ -76,7 +76,7 @@ public sealed class MemoryMarkerPlugin : IDalamudPlugin {
 				Service.Log.Debug($"[Territory: {territoryType,4}] New Waymark Found, Index {index}");
 				System.Configuration.FieldMarkerData[territoryType].MarkerData[index] = new NamedMarker {
 					Marker = *(FieldMarkerPreset*) marker,
-					Name = string.Empty
+					Name = string.Empty,
 				};
 
 				markersChanged = true;
