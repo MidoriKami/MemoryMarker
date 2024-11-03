@@ -27,7 +27,7 @@ public unsafe class AddonFieldMarkerController : IDisposable {
 
         foreach (var index in Enumerable.Range(0, value.MarkerData.Length)) {
             var atkValueIndex = index * 2 + 34;
-            ref var flagValue = ref addon->AtkUnitBase.AtkValues[atkValueIndex];
+            ref var flagValue = ref addon->AtkValues[atkValueIndex];
             ref var markerData = ref value.MarkerData[index];
             var fieldMarker = (FieldMarkerPreset*) FieldMarkerModule.Instance()->Presets.GetPointer(index);
 
@@ -39,7 +39,7 @@ public unsafe class AddonFieldMarkerController : IDisposable {
 
                     markerData = new NamedMarker {
                         Marker = *(FieldMarkerPreset*) FieldMarkerModule.Instance()->Presets.GetPointer(index),
-                        Name = string.Empty
+                        Name = string.Empty,
                     };
 
                     configChanged = true;
@@ -80,7 +80,7 @@ public unsafe class AddonFieldMarkerController : IDisposable {
 
             var nodeId = (uint) (21 + index * 2);
 
-            var buttonNode = addon->AtkUnitBase.GetButtonNodeById(nodeId);
+            var buttonNode = addon->GetButtonNodeById(nodeId);
             if (buttonNode is null) continue;
 
             var desiredLabel = $"{entryIndex + 1}. {name}";
