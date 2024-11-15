@@ -5,7 +5,7 @@ using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.Interop;
 using KamiLib.Extensions;
 using KamiLib.Window;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace MemoryMarker;
 
@@ -65,7 +65,7 @@ public sealed class MemoryMarkerPlugin : IDalamudPlugin {
 			if (marker->ContentFinderConditionId is 0) continue;
 
 			// Markers store ContentFinderConditions, we store TerritoryTypes, need to convert.
-			if (Service.DataManager.GetExcelSheet<ContentFinderCondition>()?.GetRow(marker->ContentFinderConditionId) is not { TerritoryType.Row: var territoryType }) continue;
+			var territoryType = Service.DataManager.GetExcelSheet<ContentFinderCondition>().GetRow(marker->ContentFinderConditionId).TerritoryType.RowId;
 			if (territoryType is 0) continue;
 
 			// Add a ZoneMarkerData entry for this territory if we don't have one already, do nothing if we do have one already.
